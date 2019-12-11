@@ -26,7 +26,19 @@ class Gui:
 		self.window.config(menu = menuBar)
 
 	def newFile(self):
-		pass
+		newWindow = Toplevel(self.window)
+
+		labels = [
+			"Data rozpoczecia",
+			"Data wykonania"
+		]
+
+		for index, label in enumerate(labels):
+			dummy = Label(newWindow, text = label)
+			dummy.grid(row = index, column = 0)
+
+			dummy = Entry(newWindow)
+			dummy.grid(row = index, column = 2)
 
 	def exit(self):
 		pass

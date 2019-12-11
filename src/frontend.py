@@ -30,7 +30,7 @@ class Gui:
 
 		# -- Options
 		filterMenuOptions = StringVar(self.window)
-		filterMenuOptions.set("Default")
+		filterMenuOptions.set("Filtrowanie")
 
 		filterMenu = OptionMenu(self.window, filterMenuOptions, "1", "2", "3")
 		filterMenu.pack(anchor = W)

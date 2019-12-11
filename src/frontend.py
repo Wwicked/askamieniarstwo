@@ -29,8 +29,18 @@ class Gui:
 		newWindow = Toplevel(self.window)
 		inputs = []
 
+		def checkInputs():
+			for i in range(len(inputs)):
+				if not len(inputs[i].get()):
+					return (False, "Pole %s nie zostalo uzupelnione!" %(labels[i]))
+
+			return (True, "")
+
 		def apply():
-			pass
+			valid = checkInputs()
+
+			if not valid[0]:
+				print(valid[1])
 
 		def cancel():
 			newWindow.destroy()

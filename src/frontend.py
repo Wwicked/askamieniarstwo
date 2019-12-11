@@ -33,10 +33,10 @@ class Gui:
 		filterMenuOptions.set("Filtrowanie")
 
 		filterMenu = OptionMenu(self.window, filterMenuOptions, "1", "2", "3")
-		filterMenu.pack(anchor = W)
+		filterMenu.pack(padx = 10, anchor = "nw")
 
 		filterButton = Button(self.window, text = "Filtruj", command = lambda: self.refresh(filterMenuOptions))
-		filterButton.pack(anchor = W)
+		filterButton.pack(padx = 10, anchor = "nw")
 
 		# -- List box
 		# Workaround for list box not apearing
@@ -62,15 +62,11 @@ class Gui:
 		inputs = []
 
 		def checkInputs():
-			invalidIndexes = []
-
 			# Get empty fields indexes
-			for i in range(len(inputs)):
-				if not len(inputs[i].get()):
-					invalidIndexes.append(i)
+			invalidIndexes = [ i for i in range(len(inputs)) if not len(inputs[i].get())]
 
 			if len(invalidIndexes):
-				message = "Niektóre z pól nie zostały uzupełnione:"	
+				message = "Niektóre z pól nie zostały uzupełnione:"
 
 				# Add missing field name
 				for i in invalidIndexes:
@@ -122,12 +118,10 @@ class Gui:
 
 		# Add labels
 		for index, label in enumerate(labels):
-			dummy = Label(newWindow, text = label + ":")
-			dummy.grid(row = index, column = 0, sticky = W)
-
 			inputs.append(StringVar())
-			dummy = Entry(newWindow, textvariable = inputs[index])
-			dummy.grid(row = index, column = 2)
+
+			dummy = Label(newWindow, text = label + ":").grid(row = index, column = 0, sticky = W)
+			dummy = Entry(newWindow, textvariable = inputs[index]).grid(row = index, column = 2)
 
 		# Add spacing
 		dummy = Label(newWindow, text = "")
@@ -142,8 +136,8 @@ class Gui:
 		pass
 
 	def refresh(self, _filter = None):
-		print("Refreshed with filter: %s" %(_filter.get()))
 		# TODO: Send to backend
+		print("Refreshed with filter: %s" %(_filter.get()))
 
 	def addEntry(self, *args):
 		# TODO: Send to backend

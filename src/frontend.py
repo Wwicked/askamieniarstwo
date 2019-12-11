@@ -70,8 +70,8 @@ class Gui:
 
 		buttons = [
 			[ "Ok", apply ],
-			[ "Anuluj", cancel ],
-			[ "Resetuj dane", reset ]
+			[ "Resetuj dane", reset ],
+			[ "Anuluj", cancel ]
 		]
 
 		# Add labels

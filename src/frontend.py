@@ -27,6 +27,7 @@ class Gui:
 
 	def newFile(self):
 		newWindow = Toplevel(self.window)
+		inputs = []
 
 		labels = [
 			"Data rozpoczecia",
@@ -44,12 +45,38 @@ class Gui:
 			"Status akcesoriów"
 		]
 
+		buttons = [
+			[ "Ok", self.apply ],
+			[ "Anuluj", self.cancel ],
+			[ "Resetuj dane", self.reset ]
+		]
+
+		# Add labels
 		for index, label in enumerate(labels):
 			dummy = Label(newWindow, text = label + ":")
 			dummy.grid(row = index, column = 0)
 
+			inputs.append(StringVar())
 			dummy = Entry(newWindow)
 			dummy.grid(row = index, column = 2)
+
+		# Add spacing
+		dummy = Label(newWindow, text = "")
+		dummy.grid(row = len(labels))
+
+		# Add buttons
+		for index, button in enumerate(buttons):
+			dummy = Button(newWindow, text = button[0], command = button[1])
+			dummy.grid(row = len(labels) + 1, column = index)
+
+	def apply(self):
+		pass
+
+	def cancel(self):
+		pass
+
+	def reset(self):
+		pass
 
 	def exit(self):
 		pass

@@ -31,7 +31,7 @@ class Gui:
 
 		def cancel():
 			for i in range(len(inputs)):
-				inputs.set("")
+				inputs[i].set("")
 
 		def reset():
 			pass
@@ -67,7 +67,7 @@ class Gui:
 			dummy.grid(row = index, column = 0)
 
 			inputs.append(StringVar())
-			dummy = Entry(newWindow)
+			dummy = Entry(newWindow, textvariable = inputs[index])
 			dummy.grid(row = index, column = 2)
 
 		# Add spacing

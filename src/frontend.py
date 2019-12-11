@@ -70,7 +70,7 @@ class Gui:
 
 				# Add missing field name
 				for i in invalidIndexes:
-					message += "\n\t%s" %(labels[i])
+					message += f"\n\t{labels[i]}"
 
 				return (False, message)
 			
@@ -137,7 +137,7 @@ class Gui:
 
 	def refresh(self, _filter = None):
 		# TODO: Send to backend
-		print("Refreshed with filter: %s" %(_filter.get()))
+		print(f"Refreshed with filter: {_filter.get()}")
 
 	def addEntry(self, *args):
 		# TODO: Send to backend

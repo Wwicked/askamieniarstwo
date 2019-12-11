@@ -48,7 +48,7 @@ class Gui:
 
 		# Create list box
 		listBox = Listbox(f1)
-		listBox.grid(row = 1, column = 0, sticky = E+W)
+		listBox.grid(row = 2, column = 0, sticky = E+W)
 
 		# Create bar
 		scrollBar = Scrollbar(f, orient = "vertical", command = listBox.yview)

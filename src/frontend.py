@@ -32,10 +32,20 @@ class Gui:
 
 		def checkInputs():
 			# Throw error if any of the inputs are empty
+			invalidIndexes = []
+
 			for i in range(len(inputs)):
 				if not len(inputs[i].get()):
-					return (False, "Pole %s nie zostalo uzupelnione!" %(labels[i]))
+					invalidIndexes.append(i)
 
+			if len(invalidIndexes):
+				message = "Niektóre z pól nie zostały uzupełnione:"	
+
+				for i in invalidIndexes:
+					message += "\n\t%s" %(labels[i])
+
+				return (False, message)
+			
 			return (True, "")
 
 		def apply():

@@ -15,6 +15,7 @@ class Gui:
 		self.window.mainloop()
 
 	def mainWindow(self):
+		# Menu options
 		menuBar = Menu(self.window)
 
 		fileMenu = Menu(menuBar, tearoff = 0)
@@ -25,6 +26,24 @@ class Gui:
 		menuBar.add_cascade(label = "Plik", menu = fileMenu)
 
 		self.window.config(menu = menuBar)
+
+		# Workaround for list box not apearing
+		f = Frame(self.window).place(x = 0, y = 0, width = 100, height = 100)
+		f1 = Frame(f).place(x = 0, y = 0, width = 100, height = 100)
+
+		# Create list box
+		listBox = Listbox(f1)
+		listBox.pack(side = "left", fill = "y")
+
+		# Create bar
+		scrollBar = Scrollbar(f, orient = "vertical", command = listBox.yview)
+		scrollBar.pack(side = "right", fill = "y")
+
+		# Assign bar to list box
+		listBox.config(yscrollcommand = scrollBar.set)
+
+		for i in range(100):
+			listBox.insert(END, str(i))
 
 	def newFile(self):
 		newWindow = Toplevel(self.window)
@@ -111,5 +130,6 @@ class Gui:
 		pass
 
 	def addEntry(self, *args):
+		# TODO: Send to backend
 		for i in range(len(args[0])):
 			print(args[0][i].get())

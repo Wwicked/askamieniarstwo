@@ -31,9 +31,9 @@ class Gui:
 		inputs = []
 
 		def checkInputs():
-			# Throw error if any of the inputs are empty
 			invalidIndexes = []
 
+			# Get empty fields indexes
 			for i in range(len(inputs)):
 				if not len(inputs[i].get()):
 					invalidIndexes.append(i)
@@ -41,6 +41,7 @@ class Gui:
 			if len(invalidIndexes):
 				message = "Niektóre z pól nie zostały uzupełnione:"	
 
+				# Add missing field name
 				for i in invalidIndexes:
 					message += "\n\t%s" %(labels[i])
 
@@ -51,8 +52,12 @@ class Gui:
 		def apply():
 			valid = checkInputs()
 
+			# Show error if one occured
 			if not valid[0]:
 				tkinter.messagebox.showerror("Bląd", valid[1])
+
+			else:
+				self.addEntry(inputs)
 
 		def cancel():
 			newWindow.destroy()
@@ -104,3 +109,7 @@ class Gui:
 
 	def exit(self):
 		pass
+
+	def addEntry(self, *args):
+		for i in range(len(args[0])):
+			print(args[0][i].get())

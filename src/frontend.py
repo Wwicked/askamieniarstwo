@@ -2,7 +2,9 @@ from tkinter import *
 import tkinter.messagebox
 
 class Gui:
-	def __init__(self):
+	def __init__(self, database):
+		self.database = database
+
 		self.window = Tk()
 
 		# Set window size
@@ -47,18 +49,17 @@ class Gui:
 		f1.grid(row = 1, column = 0)
 
 		# Create list box
-		listBox = Listbox(f1)
-		listBox.grid(row = 2, column = 0, sticky = E+W)
+		self.listBox = Listbox(f1)
+		self.listBox.grid(row = 2, column = 0, sticky = E+W)
 
 		# Create bar
-		scrollBar = Scrollbar(f, orient = "vertical", command = listBox.yview)
+		scrollBar = Scrollbar(f, orient = "vertical", command = self.listBox.yview)
 		scrollBar.grid(row = 1, column = 3, sticky = "NS")
 
 		# Assign bar to list box
-		listBox.config(yscrollcommand = scrollBar.set)
+		self.listBox.config(yscrollcommand = scrollBar.set)
 
-		for i in range(100):
-			listBox.insert(END, str(i))
+		self.refresh(0)
 
 	def newFile(self):
 		newWindow = Toplevel(self.window)
@@ -140,8 +141,11 @@ class Gui:
 		quit()
 
 	def refresh(self, _filter = None):
-		# TODO: Send to backend
-		print(f"Refreshed with filter: {_filter.get()}")
+		# Clear it out
+		self.listBox.delete(0, END)
+
+		for item in self.database.read(0):
+			self.listBox.insert(END, item)
 
 	def addEntry(self, *args):
 		# TODO: Send to backend

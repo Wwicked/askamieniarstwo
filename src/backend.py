@@ -2,9 +2,9 @@ import sqlite3
 
 class Database:
 	def __init__(self, name):
-		self.init()
+		self.init(name)
 
-	def init(self):
+	def init(self, name):
 		self.connection = sqlite3.connect(name)
 		self.cursor = self.connection.cursor()
 
@@ -30,10 +30,8 @@ class Database:
 	def read(self, filter):
 		self.cursor.execute("SELECT * FROM test WHERE 1;")
 		
-		dummy = self.cursor.fetchall()
+		return self.cursor.fetchall()
 
-		# TODO: delete this
-		for item in dummy:
-			print(item)
-
-		return dummy
+	def insert(self, *a):
+		self.cursor.execute("INSERT INTO test VALUES (NULL,?,?,?,?,?,?,?,?,?,?,?,?);", (a[0], a[1], a[2], a[3], a[4], a[5], a[6], a[7], a[8], a[9], a[10], a[11]))
+		self.connection.commit()

@@ -26,6 +26,16 @@ class Gui:
 		self.window.config(menu = menuBar)
 
 	def newFile(self):
+		def apply():
+			pass
+
+		def cancel():
+			for i in range(len(inputs)):
+				inputs.set("")
+
+		def reset():
+			pass
+
 		newWindow = Toplevel(self.window)
 		inputs = []
 
@@ -46,9 +56,9 @@ class Gui:
 		]
 
 		buttons = [
-			[ "Ok", self.apply ],
-			[ "Anuluj", self.cancel ],
-			[ "Resetuj dane", self.reset ]
+			[ "Ok", apply ],
+			[ "Anuluj", cancel ],
+			[ "Resetuj dane", reset ]
 		]
 
 		# Add labels
@@ -68,15 +78,6 @@ class Gui:
 		for index, button in enumerate(buttons):
 			dummy = Button(newWindow, text = button[0], command = button[1])
 			dummy.grid(row = len(labels) + 1, column = index)
-
-	def apply(self):
-		pass
-
-	def cancel(self):
-		pass
-
-	def reset(self):
-		pass
 
 	def exit(self):
 		pass

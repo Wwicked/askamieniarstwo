@@ -1,4 +1,5 @@
 from tkinter import *
+import tkinter.messagebox
 
 class Gui:
 	def __init__(self):
@@ -30,6 +31,7 @@ class Gui:
 		inputs = []
 
 		def checkInputs():
+			# Throw error if any of the inputs are empty
 			for i in range(len(inputs)):
 				if not len(inputs[i].get()):
 					return (False, "Pole %s nie zostalo uzupelnione!" %(labels[i]))
@@ -40,12 +42,13 @@ class Gui:
 			valid = checkInputs()
 
 			if not valid[0]:
-				print(valid[1])
+				tkinter.messagebox.showerror("Bląd", valid[1])
 
 		def cancel():
 			newWindow.destroy()
 
 		def reset():
+			# Set all to empty
 			for i in range(len(inputs)):
 				inputs[i].set("")
 

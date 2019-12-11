@@ -30,11 +30,22 @@ class Gui:
 
 		labels = [
 			"Data rozpoczecia",
-			"Data wykonania"
+			"Data wykonania",
+			"Klient",
+			"Zlecenie",
+			"Akcesoria",
+			"Zmarła",
+			"Miejsce",
+			"Zezwolenie",
+			"Cena",
+			"Zaliczka",
+			"Do zaplaty",
+			"Status zlecenia",
+			"Status akcesoriów"
 		]
 
 		for index, label in enumerate(labels):
-			dummy = Label(newWindow, text = label)
+			dummy = Label(newWindow, text = label + ":")
 			dummy.grid(row = index, column = 0)
 
 			dummy = Entry(newWindow)

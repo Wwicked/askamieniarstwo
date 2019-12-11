@@ -33,23 +33,26 @@ class Gui:
 		filterMenuOptions.set("Filtrowanie")
 
 		filterMenu = OptionMenu(self.window, filterMenuOptions, "1", "2", "3")
-		filterMenu.pack(padx = 10, anchor = "nw")
+		filterMenu.grid(row = 0, column = 0)
 
 		filterButton = Button(self.window, text = "Filtruj", command = lambda: self.refresh(filterMenuOptions))
-		filterButton.pack(padx = 10, anchor = "nw")
+		filterButton.grid(row = 0, column = 2)
 
 		# -- List box
 		# Workaround for list box not apearing
-		f = Frame(self.window).place()
-		f1 = Frame(f).place()
+		f = Frame(self.window)
+		f.grid(row = 1, column = 0)
+
+		f1 = Frame(f)
+		f1.grid(row = 1, column = 0)
 
 		# Create list box
 		listBox = Listbox(f1)
-		listBox.pack(side = "left", fill = "both", expand = True)
+		listBox.grid(row = 1, column = 0, sticky = E+W)
 
 		# Create bar
 		scrollBar = Scrollbar(f, orient = "vertical", command = listBox.yview)
-		scrollBar.pack(side = "right", fill = "y")
+		scrollBar.grid(row = 1, column = 3, sticky = "NS")
 
 		# Assign bar to list box
 		listBox.config(yscrollcommand = scrollBar.set)
@@ -133,7 +136,8 @@ class Gui:
 			dummy.grid(row = len(labels) + 1, column = index)
 
 	def exit(self):
-		pass
+		self.window.destroy()
+		quit()
 
 	def refresh(self, _filter = None):
 		# TODO: Send to backend

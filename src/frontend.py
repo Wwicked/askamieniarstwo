@@ -28,12 +28,12 @@ class Gui:
 		self.window.config(menu = menuBar)
 
 		# Workaround for list box not apearing
-		f = Frame(self.window).place(x = 0, y = 0, width = 100, height = 100)
-		f1 = Frame(f).place(x = 0, y = 0, width = 100, height = 100)
+		f = Frame(self.window).place(x = 0, y = 0, width = 250, height = 250)
+		f1 = Frame(f).place(x = 0, y = 0, width = 250, height = 250)
 
 		# Create list box
 		listBox = Listbox(f1)
-		listBox.pack(side = "left", fill = "y")
+		listBox.pack(side = "left", fill = "both", expand = True)
 
 		# Create bar
 		scrollBar = Scrollbar(f, orient = "vertical", command = listBox.yview)

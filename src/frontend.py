@@ -35,6 +35,9 @@ class Gui:
 		filterMenu = OptionMenu(self.window, filterMenuOptions, "1", "2", "3")
 		filterMenu.pack(anchor = W)
 
+		filterButton = Button(self.window, text = "Filtruj", command = lambda: self.refresh(filterMenuOptions))
+		filterButton.pack(anchor = W)
+
 		# -- List box
 		# Workaround for list box not apearing
 		f = Frame(self.window).place()
@@ -120,7 +123,7 @@ class Gui:
 		# Add labels
 		for index, label in enumerate(labels):
 			dummy = Label(newWindow, text = label + ":")
-			dummy.grid(row = index, column = 0)
+			dummy.grid(row = index, column = 0, sticky = W)
 
 			inputs.append(StringVar())
 			dummy = Entry(newWindow, textvariable = inputs[index])
@@ -137,6 +140,10 @@ class Gui:
 
 	def exit(self):
 		pass
+
+	def refresh(self, _filter = None):
+		print("Refreshed with filter: %s" %(_filter.get()))
+		# TODO: Send to backend
 
 	def addEntry(self, *args):
 		# TODO: Send to backend

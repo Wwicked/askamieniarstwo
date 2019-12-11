@@ -15,10 +15,11 @@ class Gui:
 		self.window.mainloop()
 
 	def mainWindow(self):
+		# -- Menu bar
 		# Menu options
 		menuBar = Menu(self.window)
 
-		fileMenu = Menu(menuBar, tearoff = 0)
+		fileMenu = Menu(menuBar, tearoff = False)
 		fileMenu.add_command(label = "Nowy plik", command = self.newFile)
 		fileMenu.add_separator()
 		fileMenu.add_command(label = "Wyjdz", command = self.exit)
@@ -27,9 +28,17 @@ class Gui:
 
 		self.window.config(menu = menuBar)
 
+		# -- Options
+		filterMenuOptions = StringVar(self.window)
+		filterMenuOptions.set("Default")
+
+		filterMenu = OptionMenu(self.window, filterMenuOptions, "1", "2", "3")
+		filterMenu.pack(anchor = W)
+
+		# -- List box
 		# Workaround for list box not apearing
-		f = Frame(self.window).place(x = 0, y = 0, width = 250, height = 250)
-		f1 = Frame(f).place(x = 0, y = 0, width = 250, height = 250)
+		f = Frame(self.window).place()
+		f1 = Frame(f).place()
 
 		# Create list box
 		listBox = Listbox(f1)

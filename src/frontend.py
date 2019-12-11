@@ -26,18 +26,18 @@ class Gui:
 		self.window.config(menu = menuBar)
 
 	def newFile(self):
+		newWindow = Toplevel(self.window)
+		inputs = []
+
 		def apply():
 			pass
 
 		def cancel():
-			for i in range(len(inputs)):
-				inputs[i].set("")
+			newWindow.destroy()
 
 		def reset():
-			pass
-
-		newWindow = Toplevel(self.window)
-		inputs = []
+			for i in range(len(inputs)):
+				inputs[i].set("")
 
 		labels = [
 			"Data rozpoczecia",

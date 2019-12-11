@@ -26,3 +26,14 @@ class Database:
 
 		# Save changes
 		self.connection.commit()
+
+	def read(self, filter):
+		self.cursor.execute("SELECT * FROM test WHERE 1;")
+		
+		dummy = self.cursor.fetchall()
+
+		# TODO: delete this
+		for item in dummy:
+			print(item)
+
+		return dummy

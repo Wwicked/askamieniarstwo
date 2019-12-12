@@ -29,9 +29,23 @@ class Database:
 
 	def read(self, filter):
 		self.cursor.execute("SELECT * FROM test WHERE 1;")
-		
+
 		return self.cursor.fetchall()
 
-	def insert(self, *a):
-		self.cursor.execute("INSERT INTO test VALUES (NULL,?,?,?,?,?,?,?,?,?,?,?,?);", (a[0], a[1], a[2], a[3], a[4], a[5], a[6], a[7], a[8], a[9], a[10], a[11]))
+	def insert(self, start = "", end = "", client = "", item = "", accesories = "", deceased = "", localisation = "", price = "", advance = "", remaining = "", order_status = "", accessories_status = ""):
+		self.cursor.execute(f"INSERT INTO test VALUES \
+			(NULL,?,?,?,?,?,?,?,?,?,?,?,?)",
+			(start,
+			end,
+			client,
+			item,
+			accesories,
+			deceased,
+			localisation,
+			price,
+			advance,
+			remaining,
+			order_status,
+			accessories_status))
+
 		self.connection.commit()

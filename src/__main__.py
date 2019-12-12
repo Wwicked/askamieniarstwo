@@ -5,6 +5,6 @@ database = Database("test.db")
 
 if __name__ == "__main__":
 	database.read(0)
-	database.insert(1,1,1,1,1,1,1,1,1,1,1,1)
+	database.insert(start = "123")
 
 	gui = Gui(database)

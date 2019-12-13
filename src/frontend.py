@@ -1,153 +1,122 @@
-from tkinter import *
-import tkinter.messagebox
+import tkinter as tk
+from tkinter import messagebox, ttk
 
-class Gui:
-	def __init__(self, database):
-		self.database = database
+'''Klasa Controller zawiera w sobie pole data które słóży do obsługi modelu danych, można tam wstawić klaske do obsługi bazy danych, plików, czy czegokolwiek innego'''
+class Controller:
+    def __init__(self, data, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.data = data
 
-		self.window = Tk()
+'''Klasa gui dziedziczy po Controllerze ( będzie miała w sobie pole data dzięki temu), oraz po tk.Tk czyli podstawowym okienku aplikacji tkintera (windows u Ciebie)'''
+class Gui(Controller, tk.Tk):
+    def __init__(self, data, *args, **kwargs):
+        super().__init__(data, *args, **kwargs)
 
-		# Set window size
-		self.window.geometry("500x500")
+        self.geometry("1024x768")
 
-		# Set window title
-		self.window.wm_title("AS Kamieniarstwo")
+		# stworzenie głównego frame dla okienka w którym będą wszystkie inne widgety i przekazanie mu pola data
+        self.main_frame = MainFrame(self, self.data)
+        self.main_frame.grid(column=0, row=0, sticky='nswe')
 
-		self.mainWindow()
-		self.window.mainloop()
+        self.rowconfigure(0, weight=1)
+        self.columnconfigure(0, weight=1)
 
-	def mainWindow(self):
-		# -- Menu bar
-		# Menu options
-		menuBar = Menu(self.window)
+		# przypisanie funkcji quit do zamknięcia okienka
+        self.protocol("WM_DELETE_WINDOW", self.quit)
 
-		fileMenu = Menu(menuBar, tearoff = False)
-		fileMenu.add_command(label = "Nowy plik", command = self.newFile)
-		fileMenu.add_separator()
-		fileMenu.add_command(label = "Wyjdz", command = self.exit)
+        self.wm_title("AS Kamieniarstwo")
 
-		menuBar.add_cascade(label = "Plik", menu = fileMenu)
+        # meniu
+        menu_bar = tk.Menu(self)
+        file_menu = tk.Menu(menu_bar, tearoff = False)
+        file_menu.add_command(label = "Nowy wpis", command = self.new_record)
+        file_menu.add_command(label = "Otwórz", command = self.open_file)
+        file_menu.add_command(label = "Zapisz", command = self.save_file)
+        file_menu.add_separator()
+        file_menu.add_command(label = "Wyjdz", command = self.quit)
 
-		self.window.config(menu = menuBar)
+        menu_bar.add_cascade(label = "Plik", menu = file_menu)
+        self.config(menu = menu_bar)
 
-		# -- Options
-		filterMenuOptions = StringVar(self.window)
-		filterMenuOptions.set("Filtrowanie")
+    def quit(self):
+        if messagebox.askyesno(title="Quit", message="Are you sure you want to quit?"):
+            self.destroy()
 
-		filterMenu = OptionMenu(self.window, filterMenuOptions, "1", "2", "3")
-		filterMenu.grid(row = 0, column = 0)
+    # https://www.python.org/dev/peps/pep-0008/#naming-conventions funkcje i zmienne snake_case, nazwy klas CamelCase :P
+    def new_record(self):
+        NewWindow(self.data)
 
-		filterButton = Button(self.window, text = "Filtruj", command = lambda: self.refresh(filterMenuOptions))
-		filterButton.grid(row = 0, column = 2)
+    def save_file(self):
+        self.data.save()
 
-		# -- List box
-		# Workaround for list box not apearing
-		f = Frame(self.window)
-		f.grid(row = 1, column = 0)
+    def open_file(self):
+        self.data.open()
+        self.main_frame.refresh()
 
-		f1 = Frame(f)
-		f1.grid(row = 1, column = 0)
+'''Główny kontenerek typu frame, Controller daje mu pole data, będzie zawierał w sobie pozostałe elementy'''
+class MainFrame(Controller, tk.Frame):
+    def __init__(self, master, data):
+        self.root = master
 
-		# Create list box
-		self.listBox = Listbox(f1)
-		self.listBox.grid(row = 2, column = 0, sticky = E+W)
+		# inicjalizacja pola data, ustawienie parenta dla frame.
+        super().__init__(data, self.root)
 
-		# Create bar
-		scrollBar = Scrollbar(f, orient = "vertical", command = self.listBox.yview)
-		scrollBar.grid(row = 1, column = 3, sticky = "NS")
+		# wstawienie contentu do głównego frejmu, możesz olać jezeli chcesz inny design.
+        self.nb = ttk.Notebook(self)
+        self.tab1 = DefaultFrame(self.nb, self.data)
+        self.tab2 = tk.Frame(self.nb)
+        self.tab3 = tk.Frame(self.nb)
+        self.nb.add(self.tab1, text='Nazwa zakładki 1')
+        self.nb.add(self.tab2, text='Nazwa zakładki 2')
+        self.nb.add(self.tab3, text='Nazwa zakładki 3')
+        self.nb.grid(column=0, row=0, sticky='nswe')
 
-		# Assign bar to list box
-		self.listBox.config(yscrollcommand = scrollBar.set)
+        # opcja bez zakładek
+        # self.content = DefaultFrame(self, self.data)
+        # self.content.grid(column=0, row=0, sticky='nswe')
 
-		self.refresh(0)
+        self.rowconfigure(0, weight=1)
+        self.columnconfigure(0, weight=1)
 
-	def newFile(self):
-		newWindow = Toplevel(self.window)
-		inputs = []
+    def refresh(self):
+        self.tab1.refresh()
+        
 
-		def checkInputs():
-			# Get empty fields indexes
-			invalidIndexes = [ i for i in range(len(inputs)) if not len(inputs[i].get())]
+class DefaultFrame(Controller, tk.Frame):
+    def __init__(self, master, data):
+        self.root = master
 
-			if len(invalidIndexes):
-				message = "Niektóre z pól nie zostały uzupełnione:"
+        # standardowa + ustawienie marginesu dla klasy bazowej Frame
+        super().__init__(data, self.root, borderwidth=5)
 
-				# Add missing field name
-				for i in invalidIndexes:
-					message += f"\n\t{labels[i]}"
+        # Treeview chyba lepiej tu siądzie od listview
+        self.tree = ttk.Treeview(self, selectmode='browse', show="headings")
 
-				return (False, message)
-			
-			return (True, "")
+        # Dodanie kolumn z klasy z danymi, ustawia ich id. 
+        self.tree["columns"] = list(self.data.labels.keys())
+        for name, text in self.data.labels.items():
+                self.tree.column(name, width=70)
+                self.tree.heading(name, text=text)
+        self.tree.grid(column=0, row=0, sticky='nswe')
 
-		def apply():
-			valid = checkInputs()
+        scroll = tk.Scrollbar(self, orient = "vertical", command = self.tree.yview)
+        scroll.grid(column = 1, row=0, sticky = "ns")
 
-			# Show error if one occured
-			if not valid[0]:
-				tkinter.messagebox.showerror("Bląd", valid[1])
+        self.rowconfigure(0, weight=1)
+        self.columnconfigure(0, weight=1)
 
-			else:
-				self.addEntry(inputs)
+        self.update()
 
-		def cancel():
-			newWindow.destroy()
+    def refresh(self):
+        self.tree.delete(*self.tree.get_children())
+        self.update()
 
-		def reset():
-			# Set all to empty
-			for i in range(len(inputs)):
-				inputs[i].set("")
+    def update(self):
+        for x in self.data.records:
+            vals = x.get()
+            self.tree.insert('', 'end', text=x.idx, values=(vals[1:]))
 
-		labels = [
-			"Data rozpoczecia",
-			"Data wykonania",
-			"Klient",
-			"Zlecenie",
-			"Akcesoria",
-			"Zmarła",
-			"Miejsce",
-			"Zezwolenie",
-			"Cena",
-			"Zaliczka",
-			"Do zaplaty",
-			"Status zlecenia",
-			"Status akcesoriów"
-		]
-
-		buttons = [
-			[ "Ok", apply ],
-			[ "Resetuj dane", reset ],
-			[ "Anuluj", cancel ]
-		]
-
-		# Add labels
-		for index, label in enumerate(labels):
-			inputs.append(StringVar())
-
-			dummy = Label(newWindow, text = label + ":").grid(row = index, column = 0, sticky = W)
-			dummy = Entry(newWindow, textvariable = inputs[index]).grid(row = index, column = 2)
-
-		# Add spacing
-		dummy = Label(newWindow, text = "")
-		dummy.grid(row = len(labels))
-
-		# Add buttons
-		for index, button in enumerate(buttons):
-			dummy = Button(newWindow, text = button[0], command = button[1])
-			dummy.grid(row = len(labels) + 1, column = index)
-
-	def exit(self):
-		self.window.destroy()
-		quit()
-
-	def refresh(self, _filter = None):
-		# Clear it out
-		self.listBox.delete(0, END)
-
-		for item in self.database.read(0):
-			self.listBox.insert(END, item)
-
-	def addEntry(self, *args):
-		# TODO: Send to backend
-		for i in range(len(args[0])):
-			print(args[0][i].get())
+# Klaska do nowego okienka, resztę bebechów można dodać jako pola tej klaski
+class NewWindow(Controller, tk.Toplevel):
+    def __init__(self, data):
+        super().__init__(data)

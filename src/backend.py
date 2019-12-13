@@ -1,51 +1,46 @@
-import sqlite3
+from collections import OrderedDict
+import pickle
+class Record():
+    # ustalam pola które będzie miał record, żeby można było potem użyć setattr
+    __slots__ = ["idx", "start_date", "end_date", "client", "item", "accessories", "deceased",
+                "localization", "permission", "price", "advance", "remaining", "order_status", "accessories_status"]
+    def __init__(self, **kwargs):
+        for key in self.__slots__:
+            if key in kwargs.keys():
+                setattr(self, key, kwargs[key])
+            else:
+                setattr(self, key, '')
+
+    # czary mary zwracam wartości moich pól jako liste
+    def get(self):
+        return [getattr(self, x) for x in self.__slots__]
 
 class Database:
-	def __init__(self, name):
-		self.init(name)
+    def __init__(self):
+        self.labels = OrderedDict([
+                        ("start_date", "Data rozpoczecia"),
+                        ("end_date", "Data wykonania"),
+                        ("client", "Klient"),
+                        ("item", "Zlecenie"),
+                        ("accessories", "Akcesoria"),
+                        ("deceased", "Zmarła"),
+                        ("localization", "Miejsce"),
+                        ("permission", "Zezwolenie"),
+                        ("price", "Cena"),
+                        ("advance", "Zaliczka"),
+                        ("remaining", "Do zaplaty"),
+                        ("order_status", "Status zlecenia"),
+                        ("accessories_status", "Status akcesoriów")])
+        self.records = []
 
-	def init(self, name):
-		self.connection = sqlite3.connect(name)
-		self.cursor = self.connection.cursor()
+    def insert(self,**kwargs):
+        self.records.append(Record(**kwargs))
 
-		# Send request
-		self.cursor.execute("CREATE TABLE IF NOT EXISTS test\
-			(id INT PRIMARY KEY,\
-			start_date INT,\
-			end_date INT,\
-			client TEXT,\
-			item TEXT,\
-			accesories TEXT,\
-			deceased TEXT,\
-			localisation TEXT,\
-			price REAL,\
-			advance REAL,\
-			remaining REAL,\
-			order_status INT,\
-			accessories_status INT);")
+    def open(self):
+        pkl_file = open('data.pkl', 'rb')
+        self.records = pickle.load(pkl_file)
 
-		# Save changes
-		self.connection.commit()
+    def save(self):
+        output = open('data.pkl', 'wb')
+        pickle.dump(self.records, output)
 
-	def read(self, filter):
-		self.cursor.execute("SELECT * FROM test WHERE 1;")
-
-		return self.cursor.fetchall()
-
-	def insert(self, start = "", end = "", client = "", item = "", accesories = "", deceased = "", localisation = "", price = "", advance = "", remaining = "", order_status = "", accessories_status = ""):
-		self.cursor.execute(f"INSERT INTO test VALUES \
-			(NULL,?,?,?,?,?,?,?,?,?,?,?,?)",
-			(start,
-			end,
-			client,
-			item,
-			accesories,
-			deceased,
-			localisation,
-			price,
-			advance,
-			remaining,
-			order_status,
-			accessories_status))
-
-		self.connection.commit()

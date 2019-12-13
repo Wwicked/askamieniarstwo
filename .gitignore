@@ -1,2 +1,4 @@
 *.db
 src/__pycache__/
+.vscode
+data.pkl

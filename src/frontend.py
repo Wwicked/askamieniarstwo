@@ -124,8 +124,8 @@ class EditFrame(Controller, tk.Frame):
 
 		labels = list(self.data.labels.values())
 
-		r = 0
 		c = 0
+		r = 0
 
 		for b in range(len(labels)):
 			c = b % 2 == 0 and 1 or 0
@@ -134,13 +134,10 @@ class EditFrame(Controller, tk.Frame):
 			self.entryValues.append(tk.StringVar())
 
 			dummy = tk.Label(self, text = labels[b] + ":")
-			dummy.grid(column = c, row = r, pady = 5, sticky = "w")
+			dummy.grid(column = c, row = r, pady = 15, sticky = "w")
 
 			dummy = tk.Entry(self, textvariable = self.entryValues[b], width = 50)
 			dummy.grid(column = c, row = r, padx = 110, sticky = "e")
-
-	def blank(self):
-		pass
 
 # Klaska do nowego okienka, resztę bebechów można dodać jako pola tej klaski
 class NewWindow(Controller, tk.Toplevel):

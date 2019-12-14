@@ -84,6 +84,7 @@ class DefaultFrame(Controller, tk.Frame):
 
 		# Dodanie kolumn z klasy z danymi, ustawia ich id. 
 		self.tree["columns"] = list(self.data.labels.keys())
+		self.tree.bind("<Button-1>", self.focus)
 
 		for name, text in self.data.labels.items():
 			self.tree.column(name, width = 70)
@@ -98,6 +99,12 @@ class DefaultFrame(Controller, tk.Frame):
 		self.columnconfigure(0, weight = 1)
 
 		self.update()
+
+	def focus(self, e):
+		index = self.tree.focus()
+		values = self.tree.item(index)["values"]
+
+		print(values)
 
 	def refresh(self):
 		self.tree.delete(*self.tree.get_children())

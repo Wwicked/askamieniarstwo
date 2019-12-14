@@ -111,12 +111,26 @@ class DefaultFrame(Controller, tk.Frame):
 class EditFrame(Controller, tk.Frame):
 	def __init__(self, master, data):
 		self.root = master
+		self.entryValues = []
 
-		super().__init__(data, self.root, bd = 10, highlightthickness = 1, highlightcolor = "black")
+		super().__init__(data, self.root, bd = 10)
 
-		for b in range(15):
-			dummy = tk.Button(self, text = "test", command = self.blank)
-			dummy.grid(column = 0, row = b)
+		labels = list(self.data.labels.values())
+
+		r = 0
+		c = 0
+
+		for b in range(len(labels)):
+			c = b % 2 == 0 and 1 or 0
+			if b % 2 == 0: r += 1
+
+			self.entryValues.append(tk.StringVar())
+
+			dummy = tk.Label(self, text = labels[b] + ":")
+			dummy.grid(column = c, row = r, pady = 5, sticky = "w")
+
+			dummy = tk.Entry(self, textvariable = self.entryValues[b], width = 50)
+			dummy.grid(column = c, row = r, padx = 110, sticky = "e")
 
 	def blank(self):
 		pass

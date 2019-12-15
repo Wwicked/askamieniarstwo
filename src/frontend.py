@@ -104,7 +104,14 @@ class DefaultFrame(Controller, tk.Frame):
 		index = self.tree.focus()
 		values = self.tree.item(index)["values"]
 
-		print(values)
+		try:
+			for i in range(len(self.data.labels.items())):
+				self.root.edit.entryValues[i].set(values[i])
+
+		except IndexError:
+			return
+
+		# IndexError przy pierwszym zaznaczeniu
 
 	def refresh(self):
 		self.tree.delete(*self.tree.get_children())

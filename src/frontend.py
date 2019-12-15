@@ -85,6 +85,7 @@ class DefaultFrame(Controller, tk.Frame):
 		# Dodanie kolumn z klasy z danymi, ustawia ich id. 
 		self.tree["columns"] = list(self.data.labels.keys())
 		self.tree.bind("<Button-1>", self.focus)
+		self.tree.bind("<FocusIn>", self.focus)
 
 		for name, text in self.data.labels.items():
 			self.tree.column(name, width = 70)
@@ -103,10 +104,11 @@ class DefaultFrame(Controller, tk.Frame):
 	def focus(self, e):
 		index = self.tree.focus()
 		values = self.tree.item(index)["values"]
+		items = self.data.labels.items()
 
 		try:
-			for i in range(len(self.data.labels.items())):
-				self.root.edit.entryValues[i].set(values[i])
+			for i in range(len(items)):
+				self.root.edit.entry_values[i].set(values[i])
 
 		except IndexError:
 			return
@@ -125,7 +127,7 @@ class DefaultFrame(Controller, tk.Frame):
 class EditFrame(Controller, tk.Frame):
 	def __init__(self, master, data):
 		self.root = master
-		self.entryValues = []
+		self.entry_values = []
 
 		super().__init__(data, self.root, bd = 10)
 
@@ -138,12 +140,12 @@ class EditFrame(Controller, tk.Frame):
 			c = b % 2 == 0 and 1 or 0
 			if b % 2 == 0: r += 1
 
-			self.entryValues.append(tk.StringVar())
+			self.entry_values.append(tk.StringVar())
 
 			dummy = tk.Label(self, text = labels[b] + ":")
 			dummy.grid(column = c, row = r, pady = 15, sticky = "w")
 
-			dummy = tk.Entry(self, textvariable = self.entryValues[b], width = 50)
+			dummy = tk.Entry(self, textvariable = self.entry_values[b], width = 50)
 			dummy.grid(column = c, row = r, padx = 110, sticky = "e")
 
 # Klaska do nowego okienka, resztę bebechów można dodać jako pola tej klaski

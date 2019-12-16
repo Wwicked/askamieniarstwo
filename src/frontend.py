@@ -46,14 +46,14 @@ class Gui(Controller, tk.Tk):
 
 	# https://www.python.org/dev/peps/pep-0008/#naming-conventions funkcje i zmienne snake_case, nazwy klas CamelCase :P
 	def new_record(self):
-		NewWindow(self.data)
+		NewWindow(self, self.data)
 
 	def save_file(self):
 		self.data.save()
 
 	def open_file(self):
 		self.data.open()
-		self.main_frame.refresh()
+		self.main_frame.content.refresh()
 
 '''Główny kontenerek typu frame, Controller daje mu pole data, będzie zawierał w sobie pozostałe elementy'''
 class MainFrame(Controller, tk.Frame):
@@ -85,7 +85,6 @@ class DefaultFrame(Controller, tk.Frame):
 		# Dodanie kolumn z klasy z danymi, ustawia ich id. 
 		self.tree["columns"] = list(self.data.labels.keys())
 		self.tree.bind("<Button-1>", self.focus)
-		self.tree.bind("<FocusIn>", self.focus)
 
 		for name, text in self.data.labels.items():
 			self.tree.column(name, width = 70)
@@ -135,20 +134,27 @@ class EditFrame(Controller, tk.Frame):
 
 		c = 0
 		r = 0
+		py = 0
 
 		for b in range(len(labels)):
-			c = b % 2 == 0 and 1 or 0
-			if b % 2 == 0: r += 1
+			c = b % 2 == 0 and 1 or 0 # Column
+			if b % 2 == 0: r += 1 # Row
+			if b == 2: py = 15 # pady
 
 			self.entry_values.append(tk.StringVar())
 
 			dummy = tk.Label(self, text = labels[b] + ":")
-			dummy.grid(column = c, row = r, pady = 15, sticky = "w")
+			dummy.grid(column = c, row = r, pady = py, sticky = "w")
 
 			dummy = tk.Entry(self, textvariable = self.entry_values[b], width = 50)
-			dummy.grid(column = c, row = r, padx = 110, sticky = "e")
+			dummy.grid(column = c, row = r, padx = 125, sticky = "e")
 
 # Klaska do nowego okienka, resztę bebechów można dodać jako pola tej klaski
 class NewWindow(Controller, tk.Toplevel):
-	def __init__(self, data):
-		super().__init__(data)
+	def __init__(self, master, data):
+		self.root = master
+
+		super().__init__(data, self.root)
+
+		self.geometry("640x480")
+		self.wm_title("Dodawanie wpisu")

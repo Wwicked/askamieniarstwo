@@ -70,13 +70,13 @@ class MainFrame(Controller, tk.Frame):
 
         self.edit_options = EditButtons(self, self.data)
         self.edit_options.grid(column = 0, row = 1, sticky = "nswe")
-        self.rowconfigure(1, weight = 3)
-        self.columnconfigure(1, weight = 3)
+        self.rowconfigure(1, weight = 1)
+        self.columnconfigure(1, weight = 1)
 
         self.content = DefaultFrame(self, self.data)
         self.content.grid(column = 0, row = 2, sticky = "nswe")
-        self.rowconfigure(2, weight = 5)
-        self.columnconfigure(2, weight = 5)
+        self.rowconfigure(2, weight = 8)
+        self.columnconfigure(2, weight = 8)
         
 class DefaultFrame(Controller, tk.Frame):
     def __init__(self, master, data):
@@ -137,18 +137,22 @@ class EditFrame(Controller, tk.Frame):
         r = 0
         py = 0
 
-        for b in range(len(labels)):
-            c = b % 2 == 0 and 1 or 0 # Column
-            if b % 2 == 0: r += 1 # Row
-            if b == 2: py = 15 # Pady
+        for iterator in range(len(labels)):
+            c = iterator % 2 == 0 and 1 or 0 # Column
+            if iterator % 2 == 0: r += 1 # Row
+            if iterator == 2: py = 15 # Pady
 
             self.entry_values.append(tk.StringVar())
+            self.entry_values[iterator].trace("w", lambda name, entry, mode, callback = self.entry_values[iterator]: self.callback(self.entry_values[iterator]))
 
-            dummy = tk.Label(self, text = labels[b] + ":")
+            dummy = tk.Label(self, text = labels[iterator] + ":")
             dummy.grid(column = c, row = r, pady = py, sticky = "w")
 
-            dummy = tk.Entry(self, textvariable = self.entry_values[b], width = 50)
+            dummy = tk.Entry(self, textvariable = self.entry_values[iterator], width = 50)
             dummy.grid(column = c, row = r, padx = 125, sticky = "e")
+
+    def callback(self, entry):
+    	self.root.edit_options.b_save["state"] = "normal"
 
 class EditButtons(Controller, tk.Frame):
     def __init__(self, master, data):
@@ -156,8 +160,9 @@ class EditButtons(Controller, tk.Frame):
 
         super().__init__(data, self.root, bd = 10, bg = "red")
 
-        b_save = tk.Button(self, text = "Zapisz zmiany", command = self.save)
-        b_save.grid(column = 0, row = 0)
+        self.b_save = tk.Button(self, text = "Zapisz zmiany", command = self.save)
+        self.b_save.grid(column = 0, row = 0)
+        self.b_save["state"] = "disabled"
 
     def save(self):
         index = self.root.content.focused

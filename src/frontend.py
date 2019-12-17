@@ -99,7 +99,7 @@ class TreeFrame(Controller, tk.Frame):
 
         scroll = tk.Scrollbar(self, orient = "vertical", command = self.tree.yview)
         scroll.grid(column = 1, row = 0, sticky = "nswe")
-        
+
         self.tree.configure(yscrollcommand = scroll.set)
         self.rowconfigure(0, weight = 1)
         self.columnconfigure(0, weight = 1)
@@ -115,7 +115,8 @@ class TreeFrame(Controller, tk.Frame):
 
         # Show focused record data in entries.
         for i in range(len(items)):
-            self.root.edit_frame.entry_values[i].set(values[i])
+            self.root.edit_frame.text[i].delete("1.0", "end")
+            self.root.edit_frame.text[i].insert("1.0", values[i])
 
         # Enables buttons
         self.root.buttons_frame.set_button_state(_all = True, state = "normal")
@@ -125,7 +126,7 @@ class TreeFrame(Controller, tk.Frame):
         self.root.buttons_frame.set_button_state(_all = True, state = "disabled")
 
         for i in range(len(self.data.labels.values())):
-            self.root.edit_frame.entry_values[i].set("")
+            self.root.edit_frame.text[i].delete("1.0", "end")
 
     def refresh(self):
         self.tree.delete(*self.tree.get_children())
@@ -139,7 +140,7 @@ class TreeFrame(Controller, tk.Frame):
 class EditFrame(Controller, tk.Frame):
     def __init__(self, master, data):
         self.root = master
-        self.entry_values = []
+        self.text = []
 
         super().__init__(data, self.root, bd = 10)
 
@@ -147,24 +148,19 @@ class EditFrame(Controller, tk.Frame):
 
         c = 0
         r = 0
+        heights = [2] * len(labels)
 
         for iterator in range(len(labels)):
             c = iterator % 2 == 0 and 1 or 0 # Column
             if iterator % 2 == 0: r += 1 # Row
 
-            self.entry_values.append(tk.StringVar())
-            self.entry_values[iterator].trace("w", lambda name, entry, mode, callback = self.entry_values[iterator]: self.callback(self.entry_values[iterator]))
-
             dummy = tk.Label(self, text = labels[iterator] + ":")
             dummy.grid(column = c, row = r, pady = 12, sticky = "w")
 
-            dummy = tk.Entry(self, textvariable = self.entry_values[iterator], width = 50)
-            dummy.grid(column = c, row = r, padx = 125, sticky = "e")
+            self.text.append(tk.Text(self, height = heights[iterator], width = int(30 * 1.45)))
+            self.text[iterator].grid(column = c, row = r, padx = 105, sticky = "e")
             
             self.rowconfigure(r, weight = 2)
-
-    def callback(self, entry):
-        self.root.buttons_frame.set_button_state(names = ["save_button"], state = "normal")
 
 class ButtonsFrame(Controller, tk.Frame):
     def __init__(self, master, data):
@@ -187,7 +183,7 @@ class ButtonsFrame(Controller, tk.Frame):
     def save(self):
         index = self.root.tree_frame.focused
         data_length = range(len(self.data.labels.values()))
-        data = [self.root.edit_frame.entry_values[i].get() for i in data_length]
+        data = [self.root.edit_frame.text[i].get("1.0", "end") for i in data_length]
 
         for i in data_length:
             self.root.tree_frame.tree.set(index, i, data[i])
@@ -200,7 +196,7 @@ class ButtonsFrame(Controller, tk.Frame):
 
     def clear(self):
         for i in range(len(self.data.labels.values())):
-            self.root.edit_frame.entry_values[i].set("")
+            self.root.edit_frame.text[i].delete("1.0", "end")
 
     def set_button_state(self, _all = False, names = [], state = ""):
         # Return if state was not provided

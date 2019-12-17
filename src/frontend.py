@@ -83,11 +83,11 @@ class DefaultFrame(Controller, tk.Frame):
         self.root = master
 
         # standardowa + ustawienie marginesu dla klasy bazowej Frame
-        super().__init__(data, self.root, borderwidth = 10, bg = "green")
+        super().__init__(data, self.root, borderwidth = 10)
 
         # Treeview chyba lepiej tu siądzie od listview
         self.tree = ttk.Treeview(self, selectmode = "browse", show = "headings")
-        self.tree.grid(column = 0, row = 1, sticky = "nswe")
+        self.tree.grid(column = 0, row = 0, sticky = "nswe")
 
         # Dodanie kolumn z klasy z danymi, ustawia ich id. 
         self.tree["columns"] = list(self.data.labels.keys())
@@ -98,7 +98,7 @@ class DefaultFrame(Controller, tk.Frame):
             self.tree.heading(name, text = text)
 
         scroll = tk.Scrollbar(self, orient = "vertical", command = self.tree.yview)
-        scroll.grid(column = 1, row = 1, sticky = "nswe")
+        scroll.grid(column = 1, row = 0, sticky = "nswe")
 
         self.rowconfigure(0, weight = 1)
         self.columnconfigure(0, weight = 1)
@@ -129,7 +129,7 @@ class EditFrame(Controller, tk.Frame):
         self.root = master
         self.entry_values = []
 
-        super().__init__(data, self.root, bd = 10, bg = "blue")
+        super().__init__(data, self.root, bd = 10)
 
         labels = list(self.data.labels.values())
 
@@ -158,7 +158,7 @@ class EditButtons(Controller, tk.Frame):
     def __init__(self, master, data):
         self.root = master
 
-        super().__init__(data, self.root, bd = 10, bg = "red")
+        super().__init__(data, self.root, bd = 10)
 
         self.b_save = tk.Button(self, text = "Zapisz zmiany", command = self.save)
         self.b_save.grid(column = 0, row = 0)

@@ -112,8 +112,12 @@ class DefaultFrame(Controller, tk.Frame):
 
         self.focused = index
 
+        # Show focused record data in entries.
         for i in range(len(items)):
             self.root.edit.entry_values[i].set(values[i])
+
+        # Enables buttons
+        self.root.edit_options.set_button_state(_all = True, state = "normal")
 
     def refresh(self):
         self.tree.delete(*self.tree.get_children())
@@ -135,34 +139,36 @@ class EditFrame(Controller, tk.Frame):
 
         c = 0
         r = 0
-        py = 0
 
         for iterator in range(len(labels)):
             c = iterator % 2 == 0 and 1 or 0 # Column
             if iterator % 2 == 0: r += 1 # Row
-            if iterator == 2: py = 15 # Pady
 
             self.entry_values.append(tk.StringVar())
             self.entry_values[iterator].trace("w", lambda name, entry, mode, callback = self.entry_values[iterator]: self.callback(self.entry_values[iterator]))
 
             dummy = tk.Label(self, text = labels[iterator] + ":")
-            dummy.grid(column = c, row = r, pady = py, sticky = "w")
+            dummy.grid(column = c, row = r, pady = 12, sticky = "w")
 
             dummy = tk.Entry(self, textvariable = self.entry_values[iterator], width = 50)
             dummy.grid(column = c, row = r, padx = 125, sticky = "e")
+            
+            self.rowconfigure(r, weight = 2)
 
     def callback(self, entry):
-    	self.root.edit_options.b_save["state"] = "normal"
+        self.root.edit_options.set_button_state(names = ["save_button"], state = "normal")
 
 class EditButtons(Controller, tk.Frame):
     def __init__(self, master, data):
         self.root = master
+        self.buttons = {}
 
         super().__init__(data, self.root, bd = 10)
 
-        self.b_save = tk.Button(self, text = "Zapisz zmiany", command = self.save)
-        self.b_save.grid(column = 0, row = 0)
-        self.b_save["state"] = "disabled"
+        self.buttons["save"] = tk.Button(self, text = "Zapisz zmiany", command = self.save)
+        self.buttons["save"].grid(column = 0, row = 0)
+
+        self.set_button_state(_all = True, state = "disabled")
 
     def save(self):
         index = self.root.content.focused
@@ -171,6 +177,29 @@ class EditButtons(Controller, tk.Frame):
 
         self.root.content.update()
         self.root.content.refresh()
+
+    """
+        These two take arguments:
+            'names', list of button identifiers
+        or
+            'all', boolean
+    """
+    def set_button_state(self, _all = False, names = [], state = ""):
+        if not len(state):
+            return
+
+        if not _all and not len(names):
+            return
+
+        if _all:
+            for name in self.buttons.keys():
+                self.buttons[name]["state"] = state
+        else:
+            for name in names:
+                if name not in self.buttons.keys():
+                    continue
+
+                self.buttons[name]["state"] = state
 
 # Klaska do nowego okienka, resztę bebechów można dodać jako pola tej klaski
 class NewWindow(Controller, tk.Toplevel):

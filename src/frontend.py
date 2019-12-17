@@ -53,7 +53,7 @@ class Gui(Controller, tk.Tk):
 
     def open_file(self):
         self.data.open()
-        self.main_frame.content.refresh()
+        self.main_frame.tree_frame.refresh()
 
 '''Główny kontenerek typu frame, Controller daje mu pole data, będzie zawierał w sobie pozostałe elementy'''
 class MainFrame(Controller, tk.Frame):
@@ -63,22 +63,22 @@ class MainFrame(Controller, tk.Frame):
         # inicjalizacja pola data, ustawienie parenta dla frame.
         super().__init__(data, self.root)
 
-        self.edit = EditFrame(self, self.data)
-        self.edit.grid(column = 0, row = 0, sticky = "nswe")
+        self.edit_frame = EditFrame(self, self.data)
+        self.edit_frame.grid(column = 0, row = 0, sticky = "nswe")
         self.rowconfigure(0, weight = 1)
         self.columnconfigure(0, weight = 1)
 
-        self.edit_options = EditButtons(self, self.data)
-        self.edit_options.grid(column = 0, row = 1, sticky = "nswe")
+        self.buttons_frame = ButtonsFrame(self, self.data)
+        self.buttons_frame.grid(column = 0, row = 1, sticky = "nswe")
         self.rowconfigure(1, weight = 1)
         self.columnconfigure(1, weight = 1)
 
-        self.content = DefaultFrame(self, self.data)
-        self.content.grid(column = 0, row = 2, sticky = "nswe")
+        self.tree_frame = TreeFrame(self, self.data)
+        self.tree_frame.grid(column = 0, row = 2, sticky = "nswe")
         self.rowconfigure(2, weight = 8)
         self.columnconfigure(2, weight = 8)
         
-class DefaultFrame(Controller, tk.Frame):
+class TreeFrame(Controller, tk.Frame):
     def __init__(self, master, data):
         self.root = master
 
@@ -100,6 +100,7 @@ class DefaultFrame(Controller, tk.Frame):
         scroll = tk.Scrollbar(self, orient = "vertical", command = self.tree.yview)
         scroll.grid(column = 1, row = 0, sticky = "nswe")
 
+        self.tree.configure(yscrollcommand = scroll.set)
         self.rowconfigure(0, weight = 1)
         self.columnconfigure(0, weight = 1)
 
@@ -114,10 +115,17 @@ class DefaultFrame(Controller, tk.Frame):
 
         # Show focused record data in entries.
         for i in range(len(items)):
-            self.root.edit.entry_values[i].set(values[i])
+            self.root.edit_frame.entry_values[i].set(values[i])
 
         # Enables buttons
-        self.root.edit_options.set_button_state(_all = True, state = "normal")
+        self.root.buttons_frame.set_button_state(_all = True, state = "normal")
+
+    def reset_focus(self):
+        self.focused = -1
+        self.root.buttons_frame.set_button_state(_all = True, state = "disabled")
+
+        for i in range(len(self.data.labels.values())):
+            self.root.edit_frame.entry_values[i].set("")
 
     def refresh(self):
         self.tree.delete(*self.tree.get_children())
@@ -156,9 +164,9 @@ class EditFrame(Controller, tk.Frame):
             self.rowconfigure(r, weight = 2)
 
     def callback(self, entry):
-        self.root.edit_options.set_button_state(names = ["save_button"], state = "normal")
+        self.root.buttons_frame.set_button_state(names = ["save_button"], state = "normal")
 
-class EditButtons(Controller, tk.Frame):
+class ButtonsFrame(Controller, tk.Frame):
     def __init__(self, master, data):
         self.root = master
         self.buttons = {}
@@ -171,23 +179,28 @@ class EditButtons(Controller, tk.Frame):
         self.buttons["clear"] = tk.Button(self, text = "Wyczysc formularz", command = self.clear)
         self.buttons["clear"].grid(column = 1, row = 0, padx = 10)
 
+        self.buttons["delete"] = tk.Button(self, text = "Usun wpis", command = self.delete)
+        self.buttons["delete"].grid(column = 2, row = 0)
+
         self.set_button_state(_all = True, state = "disabled")
 
     def save(self):
-        index = self.root.content.focused
+        index = self.root.tree_frame.focused
         data_length = range(len(self.data.labels.values()))
-        data = [self.root.edit.entry_values[i].get() for i in data_length]
+        data = [self.root.edit_frame.entry_values[i].get() for i in data_length]
 
         for i in data_length:
-            self.root.content.tree.set(index, i, data[i])
+            self.root.tree_frame.tree.set(index, i, data[i])
 
     def delete(self):
-        index = self.root.content.focused
-        self.root.content.tree.delete(index)
+        index = self.root.tree_frame.focused
+        self.root.tree_frame.tree.delete(index)
+
+        self.root.tree_frame.reset_focus()
 
     def clear(self):
         for i in range(len(self.data.labels.values())):
-            self.root.edit.entry_values[i].set("")
+            self.root.edit_frame.entry_values[i].set("")
 
     def set_button_state(self, _all = False, names = [], state = ""):
         # Return if state was not provided

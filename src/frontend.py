@@ -89,7 +89,7 @@ class DefaultFrame(Controller, tk.Frame):
         self.tree = ttk.Treeview(self, selectmode = "browse", show = "headings")
         self.tree.grid(column = 0, row = 0, sticky = "nswe")
 
-        # Dodanie kolumn z klasy z danymi, ustawia ich id. 
+        # Dodanie kolumn z klasy z danymi, ustawia ich id.
         self.tree["columns"] = list(self.data.labels.keys())
         self.tree.bind("<<TreeviewSelect>>", self.focus)
 
@@ -168,26 +168,33 @@ class EditButtons(Controller, tk.Frame):
         self.buttons["save"] = tk.Button(self, text = "Zapisz zmiany", command = self.save)
         self.buttons["save"].grid(column = 0, row = 0)
 
+        self.buttons["clear"] = tk.Button(self, text = "Wyczysc formularz", command = self.clear)
+        self.buttons["clear"].grid(column = 1, row = 0, padx = 10)
+
         self.set_button_state(_all = True, state = "disabled")
 
     def save(self):
         index = self.root.content.focused
-        labels = self.data.labels.values()
-        data = [self.root.edit.entry_values[i].get() for i in range(len(labels))]
+        data_length = range(len(self.data.labels.values()))
+        data = [self.root.edit.entry_values[i].get() for i in data_length]
 
-        self.root.content.update()
-        self.root.content.refresh()
+        for i in data_length:
+            self.root.content.tree.set(index, i, data[i])
 
-    """
-        These two take arguments:
-            'names', list of button identifiers
-        or
-            'all', boolean
-    """
+    def delete(self):
+        index = self.root.content.focused
+        self.root.content.tree.delete(index)
+
+    def clear(self):
+        for i in range(len(self.data.labels.values())):
+            self.root.edit.entry_values[i].set("")
+
     def set_button_state(self, _all = False, names = [], state = ""):
+        # Return if state was not provided
         if not len(state):
             return
 
+        # Return if invalid targets were provided
         if not _all and not len(names):
             return
 

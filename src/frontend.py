@@ -99,7 +99,7 @@ class DefaultFrame(Controller, tk.Frame):
 
         scroll = tk.Scrollbar(self, orient = "vertical", command = self.tree.yview)
         scroll.grid(column = 1, row = 0, sticky = "nswe")
-
+        self.tree.configure(yscrollcommand=scroll.set)
         self.rowconfigure(0, weight = 1)
         self.columnconfigure(0, weight = 1)
 

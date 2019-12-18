@@ -3,7 +3,6 @@ from backend import Database
 import random
 
 def generate_fake_data(db):
-    # fejk data generator
     for x in range(100):
         db.insert(idx = x,
                 start_date = "%i-01-01" %(random.randint(1970, 2019)),

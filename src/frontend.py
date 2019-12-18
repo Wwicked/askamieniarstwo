@@ -1,14 +1,12 @@
 import tkinter as tk
 from tkinter import messagebox, ttk
 
-'''Klasa Controller zawiera w sobie pole data które służy do obsługi modelu danych, można tam wstawić klaske do obsługi bazy danych, plików, czy czegokolwiek innego'''
 class Controller:
     def __init__(self, data, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
         self.data = data
 
-'''Klasa gui dziedziczy po Controllerze ( będzie miała w sobie pole data dzięki temu), oraz po tk.Tk czyli podstawowym okienku aplikacji tkintera (windows u Ciebie)'''
 class Gui(Controller, tk.Tk):
     def __init__(self, data, *args, **kwargs):
         super().__init__(data, *args, **kwargs)
@@ -55,7 +53,6 @@ class Gui(Controller, tk.Tk):
         self.data.open()
         self.main_frame.tree_frame.refresh()
 
-'''Główny kontenerek typu frame, Controller daje mu pole data, będzie zawierał w sobie pozostałe elementy'''
 class MainFrame(Controller, tk.Frame):
     def __init__(self, master, data):
         self.root = master
@@ -191,7 +188,11 @@ class ButtonsFrame(Controller, tk.Frame):
         self.buttons["delete"] = tk.Button(self, text = "Usun wpis", command = self.delete)
         self.buttons["delete"].grid(column = 2, row = 0)
 
+        self.buttons["add"] = tk.Button(self, text = "Dodaj wpis", command = self.add)
+        self.buttons["add"].grid(column = 3, row = 0, padx = 15)
+
         self.set_button_state(_all = True, state = "disabled")
+        self.set_button_state(names = ["add"], state = "normal")
 
     def save(self):
         index = self.root.tree_frame.focused
@@ -210,6 +211,13 @@ class ButtonsFrame(Controller, tk.Frame):
     def clear(self):
         for i in range(len(self.data.labels.values())):
             self.root.edit_frame.text[i].delete("1.0", "end")
+
+    def add(self):
+        self.root.tree_frame.tree.insert("", "end", values = [""] * len(self.data.labels))
+        child_index = self.root.tree_frame.tree.get_children()[-1]
+
+        self.root.tree_frame.tree.focus(child_index)
+        self.root.tree_frame.tree.selection_set(child_index)
 
     def set_button_state(self, _all = False, names = [], state = ""):
         # Return if state was not provided
@@ -230,7 +238,6 @@ class ButtonsFrame(Controller, tk.Frame):
 
                 self.buttons[name]["state"] = state
 
-# Klaska do nowego okienka, resztę bebechów można dodać jako pola tej klaski
 class NewWindow(Controller, tk.Toplevel):
     def __init__(self, master, data):
         self.root = master
@@ -256,7 +263,7 @@ class SortTree:
         sorted_data = []
 
         # Get all tree columns data and create dictionary containing sort-type and column data
-        for col in len(tree_children):
+        for col in tree_children:
             column_data = self.tree.item(col)["values"]
 
             sorted_data.append({
@@ -267,7 +274,7 @@ class SortTree:
         # Convert data to floats so sorting doesnt fail
         if self.column >= 8 and self.column < 11:
             for i in range(len(sorted_data)):
-                sorted_data[i]["sort_by"] = float(sorted_data[i]["sort_by"])
+                sorted_data[i]["sort_by"] = float(sorted_data[i]["sort_by"]) # ValueError if column data is not an int/float
         
         # Sort data
         sorted_data.sort(key = lambda x : x["sort_by"], reverse = reverse)

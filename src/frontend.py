@@ -147,6 +147,30 @@ class TreeFrame(Controller, tk.Frame):
 
         SortTree(self, index, reverse)
 
+    def set_template(self, child):
+        import datetime
+
+        current_date = datetime.date.today().strftime("%Y-%m-%d")
+
+        template = [
+            current_date, # Data rozpoczecia
+            "", # Data wykonania
+            "", # Klient
+            "", # Zlecenie
+            "", # Akcesoria
+            "", # Zmarła
+            "", # Miejsce
+            "", # Zezwolenie
+            "", # Cena
+            "", # Zaliczka
+            "", # Do zaplaty
+            "", # Status zlecenia
+            "" # Status akcesoriów
+        ]
+
+        for slot in range(len(template)):
+            self.tree.set(child, slot, template[slot])
+
 class EditFrame(Controller, tk.Frame):
     def __init__(self, master, data):
         self.root = master
@@ -159,11 +183,11 @@ class EditFrame(Controller, tk.Frame):
         c = 0
         r = 0
         heights = [2] * len(labels)
-        heights = [1, 1, 1, 2, 1, 2, 1, 1, 1, 1, 1, 1, 2]
+        heights = [1, 1, 1, 3, 1, 3, 1, 1, 1, 1, 1, 1, 3]
 
         for iterator in range(len(labels)):
-            c = iterator % 2 == 0 and 1 or 0 # Column
-            if iterator % 2 == 0: r += 1 # Row
+            c = iterator % 2 == 0 and 1 or 0 # Limit 2 columns per row
+            if iterator % 2 == 0: r += 1 # Limit 2 columns per row
 
             dummy = tk.Label(self, text = labels[iterator] + ":")
             dummy.grid(column = c, row = r, pady = 6, sticky = "w")
@@ -180,10 +204,10 @@ class ButtonsFrame(Controller, tk.Frame):
 
         super().__init__(data, self.root, bd = 10)
 
-        self.buttons["save"] = tk.Button(self, text = "Zapisz zmiany", command = self.save)
+        self.buttons["save"] = tk.Button(self, text = "Zapisz wpisz", command = self.save)
         self.buttons["save"].grid(column = 0, row = 0)
 
-        self.buttons["clear"] = tk.Button(self, text = "Wyczysc formularz", command = self.clear)
+        self.buttons["clear"] = tk.Button(self, text = "Wyczysc wpis", command = self.clear)
         self.buttons["clear"].grid(column = 1, row = 0, padx = 10)
 
         self.buttons["delete"] = tk.Button(self, text = "Usun wpis", command = self.delete)
@@ -214,12 +238,19 @@ class ButtonsFrame(Controller, tk.Frame):
             self.root.edit_frame.text[i].delete("1.0", "end")
 
     def add(self):
+        # Add treeview item
         self.root.tree_frame.tree.insert("", "end", values = [""] * len(self.data.labels))
+        
+        # Get new item's id
         child_index = self.root.tree_frame.tree.get_children()[-1]
 
+        # Focus on that item
         self.root.tree_frame.tree.focus(child_index)
         self.root.tree_frame.tree.selection_set(child_index)
         self.root.tree_frame.tree.yview_moveto(1)
+
+        # Fill the template data
+        self.root.tree_frame.set_template(child_index)
 
     def set_button_state(self, _all = False, names = [], state = ""):
         # Return if state was not provided

@@ -22,7 +22,7 @@ def generate_fake_data(db):
 def main():
     database = Database()
 
-    generate_fake_data(database)
+    #generate_fake_data(database)
 
     app = Gui(database)
     app.mainloop()

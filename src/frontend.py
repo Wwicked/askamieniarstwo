@@ -28,6 +28,9 @@ class Gui(Controller, tk.Tk):
         # Set title
         self.wm_title("AS Kamieniarstwo")
 
+        # Read data file
+        self.open_file()
+
         # Create menu bar
         menu_bar = tk.Menu(self)
         file_menu = tk.Menu(menu_bar, tearoff = False)
@@ -42,17 +45,19 @@ class Gui(Controller, tk.Tk):
 
     def quit(self):
         # Ask wether to save unsaved changes
-        if self.data_saved:
-            if messagebox.askyesno(title = "Wyjdz", message = "Na pewno chcesz zamknac program?"):
-                self.destroy()
-        else:
-            if messagebox.askyesno(title = "Wyjdz", message = "Zapisac zmiany przed zamknieciem programu?"):
-                self.save_file()
+        if messagebox.askyesno(title = "Wyjdz", message = "Na pewno chcesz zamknac program?"):
+            if not self.data_saved:
+                if messagebox.askyesno(title = "Wyjdz", message = "Zapisac zmiany przed zamknieciem programu?"):
+                    self.save_file()
             
             self.destroy()
 
     def save_file(self):
+        # Update database
         self.data.save()
+
+        # Mark as saved
+        self.data_saved = True
 
     def open_file(self):
         self.data.open()
@@ -259,6 +264,26 @@ class ButtonsFrame(Controller, tk.Frame):
         # Fill the template data
         self.root.tree_frame.set_template(child_index)
 
+        # Send it to database
+        text = self.root.edit_frame.text
+        self.data.insert(idx = len(self.data.records),
+                        start_date = text[0].get("1.0", "end"),
+                        end_date = text[1].get("1.0", "end"),
+                        client = text[2].get("1.0", "end"),
+                        item = text[3].get("1.0", "end"),
+                        accessories = text[4].get("1.0", "end"),
+                        deceased = text[5].get("1.0", "end"),
+                        localization = text[6].get("1.0", "end"),
+                        permission = text[7].get("1.0", "end"),
+                        price = text[8].get("1.0", "end"),
+                        advance = text[9].get("1.0", "end"),
+                        remaining = text[10].get("1.0", "end"),
+                        order_status = text[11].get("1.0", "end"),
+                        accessories_status = text[12].get("1.0", "end"))
+
+        # Mark program as unsaved
+        self.root.root.data_saved = False
+
     def set_button_state(self, _all = False, names = [], state = ""):
         # Return if state was not provided
         if not len(state):
@@ -306,6 +331,7 @@ class SortTree:
         if self.parent.data.record_types[self.column] in [float, int]:
             for i in range(len(sorted_data)):
                 sorted_data[i]["sort_by"] = float(sorted_data[i]["sort_by"]) # ValueError if column data is not an int/float
+                # Also check if it has length
         
         # Sort data
         sorted_data.sort(key = lambda x : x["sort_by"], reverse = reverse)

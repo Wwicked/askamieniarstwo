@@ -46,4 +46,3 @@ class Database:
     def save(self):
         output = open("data.pkl", "wb")
         pickle.dump(self.records, output)
-

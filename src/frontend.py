@@ -97,10 +97,10 @@ class TreeFrame(Controller, tk.Frame):
             self.tree.column(name, width = 70)
             self.tree.heading(name, text = text)
 
-        scroll = tk.Scrollbar(self, orient = "vertical", command = self.tree.yview)
-        scroll.grid(column = 1, row = 0, sticky = "nswe")
+        self.scroll = tk.Scrollbar(self, orient = "vertical", command = self.tree.yview)
+        self.scroll.grid(column = 1, row = 0, sticky = "nswe")
 
-        self.tree.configure(yscrollcommand = scroll.set)
+        self.tree.configure(yscrollcommand = self.scroll.set)
         self.rowconfigure(0, weight = 1)
         self.columnconfigure(0, weight = 1)
 
@@ -218,6 +218,7 @@ class ButtonsFrame(Controller, tk.Frame):
 
         self.root.tree_frame.tree.focus(child_index)
         self.root.tree_frame.tree.selection_set(child_index)
+        self.root.tree_frame.scroll.yview_moveto(1.0)
 
     def set_button_state(self, _all = False, names = [], state = ""):
         # Return if state was not provided
@@ -272,7 +273,7 @@ class SortTree:
                 })
         
         # Convert data to floats so sorting doesnt fail
-        if self.column >= 8 and self.column < 11:
+        if self.parent.data.record_types[self.column] in [float, int]:
             for i in range(len(sorted_data)):
                 sorted_data[i]["sort_by"] = float(sorted_data[i]["sort_by"]) # ValueError if column data is not an int/float
         

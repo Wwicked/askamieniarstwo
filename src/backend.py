@@ -33,6 +33,7 @@ class Database:
                         ("remaining", "Do zaplaty"),
                         ("order_status", "Status zlecenia"),
                         ("accessories_status", "Status akcesoriów")])
+        self.record_types = [str, str, str, str, str, str, str, str, float, float, float, str, str]
         self.records = []
 
     def insert(self, **kwargs):

@@ -161,15 +161,16 @@ class EditFrame(Controller, tk.Frame):
         c = 0
         r = 0
         heights = [2] * len(labels)
+        heights = [1, 1, 1, 2,1, 2, 1, 1, 1, 1, 1, 1, 2]
 
         for iterator in range(len(labels)):
             c = iterator % 2 == 0 and 1 or 0 # Column
             if iterator % 2 == 0: r += 1 # Row
 
             dummy = tk.Label(self, text = labels[iterator] + ":")
-            dummy.grid(column = c, row = r, pady = 12, sticky = "w")
+            dummy.grid(column = c, row = r, pady = 6, sticky = "w")
 
-            self.text.append(tk.Text(self, height = heights[iterator], width = int(30 * 1.45)))
+            self.text.append(tk.Text(self, height = heights[iterator], width = 40))
             self.text[iterator].grid(column = c, row = r, padx = 105, sticky = "e")
             
             self.rowconfigure(r, weight = 2)
@@ -257,11 +258,13 @@ class SortTree:
                 "data" : column_data,
                 "sort_by" : column_data[self.column]
                 })
-
-        # Sort data
-        sort_data_type = type(sorted_data[0]["sort_by"])
         
-        sorted_data = sorted_data
+        # Convert data to floats so sorting doesnt fail
+        if self.column >= 8 and self.column < 11:
+            for i in range(len(sorted_data)):
+                sorted_data[i]["sort_by"] = float(sorted_data[i]["sort_by"])
+        
+        # Sort data
         sorted_data.sort(key = lambda x : x["sort_by"], reverse = reverse)
 
         # Delete all items from tree

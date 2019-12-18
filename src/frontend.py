@@ -247,10 +247,16 @@ class SortTree:
         self.data = parent.data
         self.column = column
 
+        tree_children = self.tree.get_children()
+
+        # Do nothing if theres no data to sort
+        if not len(tree_children):
+            return
+
         sorted_data = []
 
         # Get all tree columns data and create dictionary containing sort-type and column data
-        for col in self.tree.get_children():
+        for col in len(tree_children):
             column_data = self.tree.item(col)["values"]
 
             sorted_data.append({
@@ -274,4 +280,5 @@ class SortTree:
         for index in range(len(sorted_data)):
             self.tree.insert("", "end", text = index, values = sorted_data[index]["data"])
 
+        # Mark as sorted/reverse-sorted
         self.parent.is_sorted[self.column] = False if reverse else True

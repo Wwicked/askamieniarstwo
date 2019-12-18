@@ -260,7 +260,6 @@ class SortTree:
             column_data = self.tree.item(col)["values"]
 
             sorted_data.append({
-                "index" : col,
                 "data" : column_data,
                 "sort_by" : column_data[self.column]
                 })

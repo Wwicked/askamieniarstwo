@@ -85,6 +85,8 @@ class TreeFrame(Controller, tk.Frame):
         # standardowa + ustawienie marginesu dla klasy bazowej Frame
         super().__init__(data, self.root, borderwidth = 10)
 
+        self.is_sorted = [False] * len(self.data.labels.keys())
+
         # Treeview chyba lepiej tu siądzie od listview
         self.tree = ttk.Treeview(self, selectmode = "browse", show = "headings")
         self.tree.grid(column = 0, row = 0, sticky = "nswe")
@@ -92,6 +94,7 @@ class TreeFrame(Controller, tk.Frame):
         # Dodanie kolumn z klasy z danymi, ustawia ich id.
         self.tree["columns"] = list(self.data.labels.keys())
         self.tree.bind("<<TreeviewSelect>>", self.focus)
+        self.tree.bind("<Button-1>", self.sort)
 
         for name, text in self.data.labels.items():
             self.tree.column(name, width = 70)
@@ -136,6 +139,15 @@ class TreeFrame(Controller, tk.Frame):
         for x in self.data.records:
             vals = x.get()
             self.tree.insert("", "end", text = x.idx, values = (vals[1:]))
+
+    def sort(self, event):
+        if self.tree.identify("region", event.x, event.y) != "heading":
+            return
+
+        index = int(self.tree.identify_column(event.x)[1::]) - 1
+        reverse = True if self.is_sorted[index] else False
+
+        SortTree(self, index, reverse)
 
 class EditFrame(Controller, tk.Frame):
     def __init__(self, master, data):
@@ -226,3 +238,37 @@ class NewWindow(Controller, tk.Toplevel):
 
         self.geometry("640x480")
         self.wm_title("Dodawanie wpisu")
+
+class SortTree:
+    def __init__(self, parent, column, reverse):
+        self.parent = parent
+        self.tree = parent.tree
+        self.data = parent.data
+        self.column = column
+
+        sorted_data = []
+
+        # Get all tree columns data and create dictionary containing sort-type and column data
+        for col in self.tree.get_children():
+            column_data = self.tree.item(col)["values"]
+
+            sorted_data.append({
+                "index" : col,
+                "data" : column_data,
+                "sort_by" : column_data[self.column]
+                })
+
+        # Sort data
+        sort_data_type = type(sorted_data[0]["sort_by"])
+        
+        sorted_data = sorted_data
+        sorted_data.sort(key = lambda x : x["sort_by"], reverse = reverse)
+
+        # Delete all items from tree
+        self.tree.delete(*self.tree.get_children())
+
+        # Add data again in sorted order
+        for index in range(len(sorted_data)):
+            self.tree.insert("", "end", text = index, values = sorted_data[index]["data"])
+
+        self.parent.is_sorted[self.column] = False if reverse else True

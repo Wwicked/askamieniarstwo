@@ -124,6 +124,7 @@ class TreeFrame(Controller, tk.Frame):
     def reset_focus(self):
         self.focused = -1
         self.root.buttons_frame.set_button_state(_all = True, state = "disabled")
+        self.root.buttons_frame.set_button_state(names = ["add"], state = "normal")
 
         for i in range(len(self.data.labels.values())):
             self.root.edit_frame.text[i].delete("1.0", "end")
@@ -158,7 +159,7 @@ class EditFrame(Controller, tk.Frame):
         c = 0
         r = 0
         heights = [2] * len(labels)
-        heights = [1, 1, 1, 2,1, 2, 1, 1, 1, 1, 1, 1, 2]
+        heights = [1, 1, 1, 2, 1, 2, 1, 1, 1, 1, 1, 1, 2]
 
         for iterator in range(len(labels)):
             c = iterator % 2 == 0 and 1 or 0 # Column
@@ -189,7 +190,7 @@ class ButtonsFrame(Controller, tk.Frame):
         self.buttons["delete"].grid(column = 2, row = 0)
 
         self.buttons["add"] = tk.Button(self, text = "Dodaj wpis", command = self.add)
-        self.buttons["add"].grid(column = 3, row = 0, padx = 15)
+        self.buttons["add"].grid(column = 3, row = 0, padx = 30)
 
         self.set_button_state(_all = True, state = "disabled")
         self.set_button_state(names = ["add"], state = "normal")
@@ -218,7 +219,7 @@ class ButtonsFrame(Controller, tk.Frame):
 
         self.root.tree_frame.tree.focus(child_index)
         self.root.tree_frame.tree.selection_set(child_index)
-        self.root.tree_frame.scroll.yview_moveto(1.0)
+        self.root.tree_frame.tree.yview_moveto(1)
 
     def set_button_state(self, _all = False, names = [], state = ""):
         # Return if state was not provided

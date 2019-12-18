@@ -11,24 +11,26 @@ class Gui(Controller, tk.Tk):
     def __init__(self, data, *args, **kwargs):
         super().__init__(data, *args, **kwargs)
 
+        self.data_saved = True
+
         self.geometry("1024x768")
 
-        # stworzenie głównego frame dla okienka w którym będą wszystkie inne widgety i przekazanie mu pola data
+        # Main frame
         self.main_frame = MainFrame(self, self.data)
         self.main_frame.grid(column = 0, row = 0, sticky = "nswe")
 
         self.rowconfigure(0, weight = 1)
         self.columnconfigure(0, weight = 1)
 
-        # przypisanie funkcji quit do zamknięcia okienka
+        # Assign quit event
         self.protocol("WM_DELETE_WINDOW", self.quit)
 
+        # Set title
         self.wm_title("AS Kamieniarstwo")
 
-        # meniu
+        # Create menu bar
         menu_bar = tk.Menu(self)
         file_menu = tk.Menu(menu_bar, tearoff = False)
-        file_menu.add_command(label = "Nowy wpis", command = self.new_record)
         file_menu.add_command(label = "Otwórz", command = self.open_file)
         file_menu.add_command(label = "Zapisz", command = self.save_file)
         file_menu.add_separator()
@@ -39,12 +41,15 @@ class Gui(Controller, tk.Tk):
         self.config(menu = menu_bar)
 
     def quit(self):
-        if messagebox.askyesno(title = "Quit", message = "Are you sure you want to quit?"):
+        # Ask wether to save unsaved changes
+        if self.data_saved:
+            if messagebox.askyesno(title = "Wyjdz", message = "Na pewno chcesz zamknac program?"):
+                self.destroy()
+        else:
+            if messagebox.askyesno(title = "Wyjdz", message = "Zapisac zmiany przed zamknieciem programu?"):
+                self.save_file()
+            
             self.destroy()
-
-    # https://www.python.org/dev/peps/pep-0008/#naming-conventions funkcje i zmienne snake_case, nazwy klas CamelCase :P
-    def new_record(self):
-        NewWindow(self, self.data)
 
     def save_file(self):
         self.data.save()
@@ -171,6 +176,8 @@ class TreeFrame(Controller, tk.Frame):
         for slot in range(len(template)):
             self.tree.set(child, slot, template[slot])
 
+        self.root.root.data_saved = False
+
 class EditFrame(Controller, tk.Frame):
     def __init__(self, master, data):
         self.root = master
@@ -270,15 +277,6 @@ class ButtonsFrame(Controller, tk.Frame):
                     continue
 
                 self.buttons[name]["state"] = state
-
-class NewWindow(Controller, tk.Toplevel):
-    def __init__(self, master, data):
-        self.root = master
-
-        super().__init__(data, self.root)
-
-        self.geometry("640x480")
-        self.wm_title("Dodawanie wpisu")
 
 class SortTree:
     def __init__(self, parent, column, reverse):

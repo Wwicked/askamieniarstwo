@@ -195,11 +195,11 @@ class EditFrame(Controller, tk.Frame):
         heights = [2] * len(labels)
         heights = [1, 1, 1, 3, 1, 3, 1, 1, 1, 1, 1, 1, 3]
 
-        for iterator in range(len(labels)):
-            c = iterator % 2 == 0 and 1 or 0 # Limit 2 columns per row
-            if iterator % 2 == 0: r += 1 # Limit 2 columns per row
-
-            dummy = tk.Label(self, text = labels[iterator] + ":")
+        for iterator, value in enumerate(labels):
+            c = iterator % 2
+            r = iterator // 2
+            
+            dummy = tk.Label(self, text = value + ":")
             dummy.grid(column = c, row = r, pady = 6, sticky = "w")
 
             self.text.append(tk.Text(self, height = heights[iterator], width = 40))

@@ -29,7 +29,7 @@ class Gui(Controller, tk.Tk):
         self.wm_title("AS Kamieniarstwo")
 
         # Read data file
-        self.open_file()
+        # self.open_file()
 
         # Create menu bar
         menu_bar = tk.Menu(self)
@@ -78,12 +78,10 @@ class MainFrame(Controller, tk.Frame):
         self.buttons_frame = ButtonsFrame(self, self.data)
         self.buttons_frame.grid(column = 0, row = 1, sticky = "nswe")
         self.rowconfigure(1, weight = 1)
-        self.columnconfigure(1, weight = 1)
 
         self.tree_frame = TreeFrame(self, self.data)
         self.tree_frame.grid(column = 0, row = 2, sticky = "nswe")
-        self.rowconfigure(2, weight = 8)
-        self.columnconfigure(2, weight = 8)
+        self.rowconfigure(2, weight = 1)
         
 class TreeFrame(Controller, tk.Frame):
     def __init__(self, master, data):
@@ -207,7 +205,9 @@ class EditFrame(Controller, tk.Frame):
             self.text.append(tk.Text(self, height = heights[iterator], width = 40))
             self.text[iterator].grid(column = c, row = r, padx = 105, sticky = "e")
             
-            self.rowconfigure(r, weight = 2)
+            self.rowconfigure(r, weight = 1)                    
+            self.columnconfigure(c, weight = 1)
+
 
 class ButtonsFrame(Controller, tk.Frame):
     def __init__(self, master, data):
@@ -230,6 +230,12 @@ class ButtonsFrame(Controller, tk.Frame):
 
         self.set_button_state(_all = True, state = "disabled")
         self.set_button_state(names = ["add"], state = "normal")
+
+        self.rowconfigure(0, weight = 1)
+        self.columnconfigure(0, weight = 1)
+        self.columnconfigure(1, weight = 1)
+        self.columnconfigure(2, weight = 1)
+        self.columnconfigure(3, weight = 1)
 
     def save(self):
         index = self.root.tree_frame.focused

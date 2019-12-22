@@ -2,7 +2,6 @@ from collections import OrderedDict
 import pickle
 
 class Record():
-    # ustalam pola które będzie miał record, żeby można było potem użyć setattr
     __slots__ = ["idx", "start_date", "end_date", "client", "item", "accessories", "deceased",
                 "localization", "permission", "price", "advance", "remaining", "order_status", "accessories_status"]
                 
@@ -13,7 +12,6 @@ class Record():
             else:
                 setattr(self, key, "")
 
-    # czary mary zwracam wartości moich pól jako liste
     def get(self):
         return [getattr(self, x) for x in self.__slots__]
 

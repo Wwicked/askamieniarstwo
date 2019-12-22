@@ -155,32 +155,6 @@ class TreeFrame(Controller, tk.Frame):
 
         SortTree(self, index, reverse)
 
-    def set_template(self, child):
-        import datetime
-
-        current_date = datetime.date.today().strftime("%Y-%m-%d")
-
-        template = [
-            current_date, # Data rozpoczecia
-            "", # Data wykonania
-            "", # Klient
-            "", # Zlecenie
-            "", # Akcesoria
-            "", # Zmarła
-            "", # Miejsce
-            "", # Zezwolenie
-            "", # Cena
-            "", # Zaliczka
-            "", # Do zaplaty
-            "", # Status zlecenia
-            "" # Status akcesoriów
-        ]
-
-        for slot in range(len(template)):
-            self.tree.set(child, slot, template[slot])
-
-        self.root.root.data_saved = False
-
 class EditFrame(Controller, tk.Frame):
     def __init__(self, master, data):
         self.root = master
@@ -192,7 +166,6 @@ class EditFrame(Controller, tk.Frame):
 
         c = 0
         r = 0
-        heights = [2] * len(labels)
         heights = [1, 1, 1, 3, 1, 3, 1, 1, 1, 1, 1, 1, 3]
 
         for iterator, value in enumerate(labels):
@@ -228,6 +201,13 @@ class ButtonsFrame(Controller, tk.Frame):
         self.buttons["add"] = tk.Button(self, text = "Dodaj wpis", command = self.add)
         self.buttons["add"].grid(column = 3, row = 0, padx = 30)
 
+        self.buttons["search"] = tk.Button(self, text = "Wyszukaj", command = self.search)
+        self.buttons["search"].grid(column = 4, row = 0, sticky = "e")
+
+        self.search_bar = tk.Text(self, height = 1, width = 30)
+        self.search_bar.grid(column = 5, row = 0, padx = 10)
+        self.search_bar.bind("<<Modified>>", self.search_modified)
+
         self.set_button_state(_all = True, state = "disabled")
         self.set_button_state(names = ["add"], state = "normal")
 
@@ -247,8 +227,8 @@ class ButtonsFrame(Controller, tk.Frame):
 
     def delete(self):
         index = self.root.tree_frame.focused
-        self.root.tree_frame.tree.delete(index)
 
+        self.root.tree_frame.tree.delete(index)
         self.root.tree_frame.reset_focus()
 
     def clear(self):
@@ -256,39 +236,65 @@ class ButtonsFrame(Controller, tk.Frame):
             self.root.edit_frame.text[i].delete("1.0", "end")
 
     def add(self):
-        # Add treeview item
-        self.root.tree_frame.tree.insert("", "end", values = [""] * len(self.data.labels))
-        
-        # Get new item's id
-        child_index = self.root.tree_frame.tree.get_children()[-1]
+        # Create template
+        import datetime
+        import random
 
-        # Focus on that item
-        self.root.tree_frame.tree.focus(child_index)
-        self.root.tree_frame.tree.selection_set(child_index)
-        self.root.tree_frame.tree.yview_moveto(1)
+        today = datetime.date.today()
 
-        # Fill the template data
-        self.root.tree_frame.set_template(child_index)
+        current_date = today.strftime("%Y-%m-%d")
+        end_date = (today + datetime.timedelta(days = 7)).strftime("%Y-%m-%d")
+        price = float(random.randint(0, 100))
+        advance = float(price / 2)
+        remaining = price - advance
+
+        template = [
+            current_date, # Data rozpoczecia
+            end_date, # Data wykonania
+            "", # Klient
+            "", # Zlecenie
+            "", # Akcesoria
+            "", # Zmarła
+            "", # Miejsce
+            "", # Zezwolenie
+            price, # Cena
+            advance, # Zaliczka
+            remaining, # Do zaplaty
+            "", # Status zlecenia
+            "" # Status akcesoriów
+        ]
 
         # Send it to database
-        text = self.root.edit_frame.text
         self.data.insert(idx = len(self.data.records),
-                        start_date = text[0].get("1.0", "end"),
-                        end_date = text[1].get("1.0", "end"),
-                        client = text[2].get("1.0", "end"),
-                        item = text[3].get("1.0", "end"),
-                        accessories = text[4].get("1.0", "end"),
-                        deceased = text[5].get("1.0", "end"),
-                        localization = text[6].get("1.0", "end"),
-                        permission = text[7].get("1.0", "end"),
-                        price = text[8].get("1.0", "end"),
-                        advance = text[9].get("1.0", "end"),
-                        remaining = text[10].get("1.0", "end"),
-                        order_status = text[11].get("1.0", "end"),
-                        accessories_status = text[12].get("1.0", "end"))
+                        start_date = template[0],
+                        end_date = template[1],
+                        client = template[2],
+                        item = template[3],
+                        accessories = template[4],
+                        deceased = template[5],
+                        localization = template[6],
+                        permission = template[7],
+                        price = template[8],
+                        advance = template[9],
+                        remaining = template[10],
+                        order_status = template[11],
+                        accessories_status = template[12])
 
-        # Mark program as unsaved
-        self.root.root.data_saved = False
+        # Refresh tree
+        self.root.tree_frame.refresh()
+
+    def search(self):
+        pass
+
+    def search_modified(self, value = None):
+        # Update 'search' button based on search bar contents
+        if len(self.search_bar.get("1.0", "end")) > 1:
+            self.set_button_state(names = ["search"], state = "normal")
+        else:
+            self.set_button_state(names = ["search"], state = "disabled")
+
+        # Mark as unmodified to the event can happen again
+        self.search_bar.edit_modified(False)
 
     def set_button_state(self, _all = False, names = [], state = ""):
         # Return if state was not provided
@@ -308,6 +314,12 @@ class ButtonsFrame(Controller, tk.Frame):
                     continue
 
                 self.buttons[name]["state"] = state
+
+        # Handle 'search' button separately
+        if len(self.search_bar.get("1.0", "end")) > 1:
+            self.buttons["search"]["state"] = "normal"
+        else:
+            self.buttons["search"]["state"] = "disabled"
 
 class SortTree:
     def __init__(self, parent, column, reverse):
@@ -336,9 +348,14 @@ class SortTree:
         # Convert data to floats so sorting doesnt fail
         if self.parent.data.record_types[self.column] in [float, int]:
             for i in range(len(sorted_data)):
-                sorted_data[i]["sort_by"] = float(sorted_data[i]["sort_by"]) # ValueError if column data is not an int/float
-                # Also check if it has length
-        
+                if not len(sorted_data[i]["sort_by"]):
+                    continue
+
+                try:
+                    sorted_data[i]["sort_by"] = float(sorted_data[i]["sort_by"])
+                except ValueError:
+                    sorted_data[i]["sort_by"] = ""
+
         # Sort data
         sorted_data.sort(key = lambda x : x["sort_by"], reverse = reverse)
 

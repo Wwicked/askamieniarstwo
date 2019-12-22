@@ -33,14 +33,15 @@ class Database:
                         ("accessories_status", "Status akcesoriów")])
         self.record_types = [str, str, str, str, str, str, str, str, float, float, float, str, str]
         self.records = []
+        self.pickle_file = "data.pkl"
 
     def insert(self, **kwargs):
         self.records.append(Record(**kwargs))
 
     def open(self):
-        pkl_file = open("data.pkl", "rb")
+        pkl_file = open(self.pickle_file, "rb")
         self.records = pickle.load(pkl_file)
 
     def save(self):
-        output = open("data.pkl", "wb")
+        output = open(self.pickle_file, "wb")
         pickle.dump(self.records, output)

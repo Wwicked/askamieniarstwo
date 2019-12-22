@@ -1,4 +1,5 @@
 import tkinter as tk
+from pathlib import Path
 from tkinter import messagebox, ttk
 
 class Controller:
@@ -29,7 +30,8 @@ class Gui(Controller, tk.Tk):
         self.wm_title("AS Kamieniarstwo")
 
         # Read data file
-        # self.open_file()
+        if Path(self.data.pickle_file).is_file():
+            self.open_file()
 
         # Create menu bar
         menu_bar = tk.Menu(self)
@@ -194,13 +196,13 @@ class ButtonsFrame(Controller, tk.Frame):
         self.buttons["save"].grid(column = 0, row = 0)
 
         self.buttons["clear"] = tk.Button(self, text = "Wyczysc wpis", command = self.clear)
-        self.buttons["clear"].grid(column = 1, row = 0, padx = 10)
+        self.buttons["clear"].grid(column = 1, row = 0)
 
         self.buttons["delete"] = tk.Button(self, text = "Usun wpis", command = self.delete)
         self.buttons["delete"].grid(column = 2, row = 0)
 
         self.buttons["add"] = tk.Button(self, text = "Dodaj wpis", command = self.add)
-        self.buttons["add"].grid(column = 3, row = 0, padx = 10)
+        self.buttons["add"].grid(column = 3, row = 0)
 
         self.buttons["back"] = tk.Button(self, text = "Powrót", command = self.reset_view)
         self.buttons["back"].grid(column = 4, row = 0, sticky = "e")

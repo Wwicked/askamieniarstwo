@@ -29,7 +29,7 @@ class Gui(Controller, tk.Tk):
         # Set title
         self.wm_title("AS Kamieniarstwo")
 
-        # Read data file
+        # Read data file if it exists
         if Path(self.data.pickle_file).is_file():
             self.open_file()
 
@@ -69,7 +69,6 @@ class MainFrame(Controller, tk.Frame):
     def __init__(self, master, data):
         self.root = master
 
-        # inicjalizacja pola data, ustawienie parenta dla frame.
         super().__init__(data, self.root)
 
         self.edit_frame = EditFrame(self, self.data)
@@ -89,16 +88,15 @@ class TreeFrame(Controller, tk.Frame):
     def __init__(self, master, data):
         self.root = master
 
-        # standardowa + ustawienie marginesu dla klasy bazowej Frame
         super().__init__(data, self.root, borderwidth = 10)
 
         self.is_sorted = [False] * len(self.data.labels.keys())
-
-        # Treeview chyba lepiej tu siądzie od listview
+ 
+        # Create treeview widget
         self.tree = ttk.Treeview(self, selectmode = "browse", show = "headings")
         self.tree.grid(column = 0, row = 0, sticky = "nswe")
 
-        # Dodanie kolumn z klasy z danymi, ustawia ich id.
+        # Apply back-end labels to column names in treeview.
         self.tree["columns"] = list(self.data.labels.keys())
         self.tree.bind("<<TreeviewSelect>>", self.focus)
         self.tree.bind("<Button-1>", self.sort)
@@ -178,9 +176,9 @@ class EditFrame(Controller, tk.Frame):
             dummy.grid(column = c, row = r, pady = 6, sticky = "w")
 
             self.text.append(tk.Text(self, height = heights[iterator], width = 40))
-            self.text[iterator].grid(column = c, row = r, padx = 105, sticky = "e")
+            self.text[iterator].grid(column = c, row = r, padx = 10, sticky = "e")
             
-            self.rowconfigure(r, weight = 1)                    
+            self.rowconfigure(r, weight = 3)
             self.columnconfigure(c, weight = 1)
 
 
@@ -253,13 +251,16 @@ class ButtonsFrame(Controller, tk.Frame):
         price = float(random.randint(0, 100))
         advance = float(price / 2)
         remaining = price - advance
+        client = "Client%i name" %(random.randint(0, 100))
+        item = "Item no. %i" %(random.randint(0, 100))
+        accessories = "Accessories no. %i" %(random.randint(0, 100))
 
         template = [
             current_date, # Data rozpoczecia
             end_date, # Data wykonania
-            "", # Klient
-            "", # Zlecenie
-            "", # Akcesoria
+            client, # Klient
+            item, # Zlecenie
+            accessories, # Akcesoria
             "", # Zmarła
             "", # Miejsce
             "", # Zezwolenie
@@ -288,6 +289,13 @@ class ButtonsFrame(Controller, tk.Frame):
 
         # Refresh tree
         self.root.tree_frame.refresh()
+
+        # Focus on new entry
+        index = self.root.tree_frame.tree.get_children()[-1]
+
+        self.root.tree_frame.tree.focus(index)
+        self.root.tree_frame.tree.selection_set(index)
+        self.root.tree_frame.tree.yview_moveto('1.0')
 
     def search(self):
         searched_phrase = self.search_bar.get("1.0", "end") # Get searched phrase
@@ -431,3 +439,8 @@ class SortTree:
 
         # Mark as sorted/reverse-sorted
         self.parent.is_sorted[self.column] = False if reverse else True
+
+
+"""
+Bugs: no focus when adding new entry
+"""

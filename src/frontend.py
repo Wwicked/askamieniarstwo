@@ -12,8 +12,6 @@ class Gui(Controller, tk.Tk):
     def __init__(self, data, *args, **kwargs):
         super().__init__(data, *args, **kwargs)
 
-        self.data_saved = True
-
         self.geometry("1024x768")
 
         # Main frame
@@ -48,18 +46,11 @@ class Gui(Controller, tk.Tk):
     def quit(self):
         # Ask wether to save unsaved changes
         if messagebox.askyesno(title = "Wyjdz", message = "Na pewno chcesz zamknac program?"):
-            if not self.data_saved:
-                if messagebox.askyesno(title = "Wyjdz", message = "Zapisac zmiany przed zamknieciem programu?"):
-                    self.save_file()
-            
             self.destroy()
 
     def save_file(self):
         # Update database
         self.data.save()
-
-        # Mark as saved
-        self.data_saved = True
 
     def open_file(self):
         self.data.open()
@@ -230,10 +221,15 @@ class ButtonsFrame(Controller, tk.Frame):
             self.root.tree_frame.tree.set(index, i, data[i])
 
     def delete(self):
-        index = self.root.tree_frame.focused
+        """ Preferably this function should NOT refresh treeview at any point since we dont want to re-order the view from sorted. """
+        
+        # Remove from treeview
+        tree_index = self.root.tree_frame.focused
 
-        self.root.tree_frame.tree.delete(index)
+        self.root.tree_frame.tree.delete(tree_index)
         self.root.tree_frame.reset_focus()
+
+        # Remove from database
 
     def clear(self):
         for i in range(len(self.data.labels.values())):
@@ -439,8 +435,3 @@ class SortTree:
 
         # Mark as sorted/reverse-sorted
         self.parent.is_sorted[self.column] = False if reverse else True
-
-
-"""
-Bugs: no focus when adding new entry
-"""

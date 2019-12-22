@@ -38,6 +38,23 @@ class Database:
     def insert(self, **kwargs):
         self.records.append(Record(**kwargs))
 
+    def remove(self, index):
+        # Store current records as a list
+        recs = list(self.records)
+        
+        # Remove the item
+        del recs[index]
+        
+        # Clear out records
+        self.records = []
+
+        # Create records once again
+        for r in recs:
+            self.records.append(r)
+
+        # Save the file
+        self.save()
+
     def open(self):
         pkl_file = open(self.pickle_file, "rb")
         self.records = pickle.load(pkl_file)

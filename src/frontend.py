@@ -186,6 +186,7 @@ class ButtonsFrame(Controller, tk.Frame):
     def __init__(self, master, data):
         self.root = master
         self.buttons = {}
+        self.search_view = False
 
         super().__init__(data, self.root, bd = 10)
 
@@ -199,13 +200,16 @@ class ButtonsFrame(Controller, tk.Frame):
         self.buttons["delete"].grid(column = 2, row = 0)
 
         self.buttons["add"] = tk.Button(self, text = "Dodaj wpis", command = self.add)
-        self.buttons["add"].grid(column = 3, row = 0, padx = 30)
+        self.buttons["add"].grid(column = 3, row = 0, padx = 10)
+
+        self.buttons["back"] = tk.Button(self, text = "Powrót", command = self.reset_view)
+        self.buttons["back"].grid(column = 4, row = 0, sticky = "e")
 
         self.buttons["search"] = tk.Button(self, text = "Wyszukaj", command = self.search)
-        self.buttons["search"].grid(column = 4, row = 0, sticky = "e")
+        self.buttons["search"].grid(column = 5, row = 0, sticky = "e")
 
         self.search_bar = tk.Text(self, height = 1, width = 30)
-        self.search_bar.grid(column = 5, row = 0, padx = 10)
+        self.search_bar.grid(column = 6, row = 0, padx = 10)
         self.search_bar.bind("<<Modified>>", self.search_modified)
 
         self.set_button_state(_all = True, state = "disabled")
@@ -284,7 +288,57 @@ class ButtonsFrame(Controller, tk.Frame):
         self.root.tree_frame.refresh()
 
     def search(self):
-        pass
+        searched_phrase = self.search_bar.get("1.0", "end") # Get searched phrase
+        searched_phrase = searched_phrase[: len(searched_phrase) - 1] # Get rid of new-line character
+        found = []
+
+        # Iterate over all records and find the one containing searched phrase
+        for rec in self.data.records:
+            record_data = rec.get()
+
+            for field in record_data:
+                # Skip if phrase not found
+                if not searched_phrase in str(field):
+                    continue
+                
+                # Save if phrase was found
+                else:
+                    found.append(record_data)
+
+                    break
+
+        # No entries found
+        if not len(found):
+            return
+
+        self.search_view = True
+
+        # Enable the 'back' button
+        self.buttons["back"]["state"] = "normal"
+
+        # Clear the treeview
+        self.root.tree_frame.tree.delete(*self.root.tree_frame.tree.get_children())
+        
+        # Add found fields
+        for rec in found:
+            self.root.tree_frame.tree.insert("", "end", values = rec[1:])
+
+    def reset_view(self):
+        # Mark as not-in-search
+        self.search_view = False
+        
+        # Disable the 'back' button
+        self.buttons["back"]["state"] = "disabled"
+
+        # Delete treeview
+        self.root.tree_frame.tree.delete(*self.root.tree_frame.tree.get_children())
+        
+        # Create treeview again
+        for rec in self.data.records:
+            self.root.tree_frame.tree.insert("", "end", values = rec.get()[1:])
+
+        # Clear the search bar
+        self.search_bar.delete("1.0", "end")
 
     def search_modified(self, value = None):
         # Update 'search' button based on search bar contents
@@ -321,6 +375,12 @@ class ButtonsFrame(Controller, tk.Frame):
         else:
             self.buttons["search"]["state"] = "disabled"
 
+        # Handle 'back' button separately
+        if self.search_view:
+            self.buttons["back"]["state"] = "normal"
+        else:
+            self.buttons["back"]["state"] = "disabled"
+
 class SortTree:
     def __init__(self, parent, column, reverse):
         self.parent = parent
@@ -353,6 +413,7 @@ class SortTree:
 
                 try:
                     sorted_data[i]["sort_by"] = float(sorted_data[i]["sort_by"])
+
                 except ValueError:
                     sorted_data[i]["sort_by"] = ""
 

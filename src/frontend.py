@@ -164,13 +164,16 @@ class EditFrame(Controller, tk.Frame):
             r = iterator // 2
             
             dummy = tk.Label(self, text = value + ":")
-            dummy.grid(column = c, row = r, pady = 6, sticky = "w")
+            dummy.grid(column = c*2, row = r, pady = 6, sticky = "w")
 
-            self.text.append(tk.Text(self, height = heights[iterator], width = 40))
-            self.text[iterator].grid(column = c, row = r, padx = 10, sticky = "e")
+            self.text.append(tk.Text(self, height = heights[iterator], width = 200))
+            self.text[iterator].grid(column = c*2+1, row = r, padx = 10, sticky = "e")
             
-            self.rowconfigure(r, weight = 3)
-            self.columnconfigure(c, weight = 1)
+            self.rowconfigure(r, weight = 1)
+        self.columnconfigure(0, weight = 0)
+        self.columnconfigure(1, weight = 1)
+        self.columnconfigure(2, weight = 0)
+        self.columnconfigure(3, weight = 1)
 
 
 class ButtonsFrame(Controller, tk.Frame):

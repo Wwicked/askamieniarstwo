@@ -135,7 +135,7 @@ class TreeFrame(Controller, tk.Frame):
     def update(self):
         for x in self.data.records:
             vals = x.get()
-            self.tree.insert("", "end", text = x.idx, values = (vals[1:]))
+            self.tree.insert("", "end", iid = x.idx, text = x.idx, values = (vals[1:]))
 
     def sort(self, event):
         if self.tree.identify("region", event.x, event.y) != "heading":
@@ -228,7 +228,7 @@ class ButtonsFrame(Controller, tk.Frame):
         
         # Remove from treeview
         tree_index = self.root.tree_frame.focused
-
+        
         self.root.tree_frame.tree.delete(tree_index)
         self.root.tree_frame.reset_focus()
 
@@ -330,7 +330,7 @@ class ButtonsFrame(Controller, tk.Frame):
         
         # Add found fields
         for rec in found:
-            self.root.tree_frame.tree.insert("", "end", values = rec[1:])
+            self.root.tree_frame.tree.insert("", "end", iid=rec[0], values = rec[1:])
 
     def reset_view(self):
         # Mark as not-in-search
@@ -344,7 +344,7 @@ class ButtonsFrame(Controller, tk.Frame):
         
         # Create treeview again
         for rec in self.data.records:
-            self.root.tree_frame.tree.insert("", "end", values = rec.get()[1:])
+            self.root.tree_frame.tree.insert("", "end", iid=rec.get()[0], values = rec.get()[1:])
 
         # Clear the search bar
         self.search_bar.delete("1.0", "end")
@@ -434,7 +434,7 @@ class SortTree:
 
         # Add data again in sorted order
         for index in range(len(sorted_data)):
-            self.tree.insert("", "end", text = index, values = sorted_data[index]["data"])
+            self.tree.insert("", "end", iid= index, text = index, values = sorted_data[index]["data"])
 
         # Mark as sorted/reverse-sorted
         self.parent.is_sorted[self.column] = False if reverse else True
